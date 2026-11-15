@@ -1,0 +1,15 @@
+{
+ "_doc": "Counts by eye on whole validation sheets, from clean renders, not from the signature rule. index is the 0-based page. A sink is one basin unit (a double-bowl kitchen sink is 1). Mop sinks and drinking fountains are not sinks. A window is one opening in an exterior wall; panes with only a mullion between them are one window. approx: the count of that class has an error of about 15 %.",
+ "sheets": [
+  {"pdf": "cdcsa__Standard_Drawings_SAC_6-10_Small_SEP2022.pdf", "index": 1,
+   "toilet": 9, "urinal": 1, "sink": 15, "window": 24, "approx": ["window"]},
+  {"pdf": "cdcsa__Standard_Drawings_SAC_6-10_Medium_SEP2022.pdf", "index": 1,
+   "toilet": 13, "urinal": 5, "sink": 19, "window": 18, "approx": ["window", "sink"]},
+  {"pdf": "cdcsa__Standard_Drawings_SAC_6-10_Large_SEP2022.pdf", "index": 1,
+   "toilet": 12, "urinal": 3, "sink": 16, "window": 30, "approx": ["window", "sink", "toilet"]},
+  {"pdf": "cof__COF_Standard_Design_Rev_6.0_dated_20260522.pdf", "index": 46,
+   "toilet": 11, "urinal": 7, "sink": 12, "window": 0, "approx": []},
+  {"pdf": "sprc__Design_Guide_SPRC_FULL_TIER1_Sep_2021.pdf", "index": 2,
+   "toilet": 8, "urinal": 3, "sink": 7, "window": 0, "approx": ["sink"]}
+ ]
+}

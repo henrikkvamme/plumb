@@ -1,0 +1,581 @@
+{
+ "rule": "measures right within 2%, widths within 0.01 m; a key with no value is right only when we abstain",
+ "keys_vs_ours": {
+  "interior_wall_m": {
+   "right": 4,
+   "wrong": 1,
+   "abstained": 0
+  },
+  "exterior_wall_m": {
+   "right": 8,
+   "wrong": 1,
+   "abstained": 1
+  },
+  "door_mean_m": {
+   "right": 1,
+   "wrong": 1,
+   "abstained": 0
+  },
+  "door_max_m": {
+   "right": 2,
+   "wrong": 1,
+   "abstained": 0
+  },
+  "door_min_m": {
+   "right": 2,
+   "wrong": 1,
+   "abstained": 0
+  },
+  "window_max_m": {
+   "right": 3,
+   "wrong": 0,
+   "abstained": 0
+  },
+  "window_min_m": {
+   "right": 2,
+   "wrong": 0,
+   "abstained": 0
+  },
+  "skirting_m": {
+   "right": 0,
+   "wrong": 1,
+   "abstained": 0
+  }
+ },
+ "door_keys_vs_nominal_width": {
+  "door_mean_m": {
+   "right": 1,
+   "wrong": 0,
+   "abstained": 0
+  },
+  "door_max_m": {
+   "right": 1,
+   "wrong": 0,
+   "abstained": 0
+  },
+  "door_min_m": {
+   "right": 1,
+   "wrong": 0,
+   "abstained": 0
+  }
+ },
+ "wall_axis_vs_qto_rel": {
+  "n": 938,
+  "median": 0.03093,
+  "p90": 0.13636,
+  "p95": 0.13663,
+  "p99": 0.17708,
+  "max": 0.20833
+ },
+ "space_footprint_vs_qto_rel": {
+  "n": 402,
+  "median": 0.0,
+  "p90": 0.0,
+  "p95": 0.0,
+  "p99": 0.0,
+  "max": 0.14135
+ },
+ "skipped_large": [
+  "sixty5_arc.ifc"
+ ],
+ "files": [
+  {
+   "file": "4351_arc.ifc",
+   "seconds": 0.1,
+   "ours": {
+    "total_wall_m": 279.072,
+    "exterior_wall_m": 263.304,
+    "interior_wall_m": 15.768,
+    "door_mean_m": 0.992,
+    "door_max_m": 1.7272,
+    "door_min_m": 0.9144,
+    "window_max_m": 2.7432,
+    "window_min_m": 0.9144,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 304.805
+   },
+   "compared": {
+    "interior_wall_m": {
+     "key": 17.18,
+     "ours": 15.768,
+     "outcome": "wrong"
+    },
+    "exterior_wall_m": {
+     "key": 267.45,
+     "ours": 263.304,
+     "outcome": "right"
+    },
+    "door_mean_m": {
+     "key": 0.99,
+     "ours": 0.992,
+     "outcome": "right"
+    },
+    "door_max_m": {
+     "key": 1.73,
+     "ours": 1.7272,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "ac20_arc.ifc",
+   "seconds": 0.3,
+   "ours": {
+    "total_wall_m": 1166.0,
+    "exterior_wall_m": 643.8,
+    "interior_wall_m": 522.2,
+    "door_mean_m": 1.106,
+    "door_max_m": 2.0,
+    "door_min_m": 1.0,
+    "window_max_m": 1.0,
+    "window_min_m": 0.9,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 1564.2
+   },
+   "compared": {
+    "door_min_m": {
+     "key": 1.0,
+     "ours": 1.0,
+     "outcome": "right"
+    },
+    "window_max_m": {
+     "key": 1.0,
+     "ours": 1.0,
+     "outcome": "right"
+    },
+    "window_min_m": {
+     "key": 0.9,
+     "ours": 0.9,
+     "outcome": "right"
+    },
+    "interior_wall_m": {
+     "key": 522.2,
+     "ours": 522.2,
+     "outcome": "right"
+    },
+    "exterior_wall_m": {
+     "key": 643.8,
+     "ours": 643.8,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 121,
+   "spaces_footprint_vs_qto": 82
+  },
+  {
+   "file": "city_house_munich_arc.ifc",
+   "seconds": 0.4,
+   "ours": {
+    "total_wall_m": 464.394,
+    "exterior_wall_m": 399.786,
+    "interior_wall_m": 64.608,
+    "door_mean_m": 1.329,
+    "door_max_m": 3.454,
+    "door_min_m": 0.68,
+    "window_max_m": 2.0,
+    "window_min_m": 0.74,
+    "door_nominal_mean_m": 1.1,
+    "door_nominal_max_m": 1.4,
+    "door_nominal_min_m": 0.8,
+    "skirting_m": 165.124
+   },
+   "compared": {},
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "dental_clinic_arc.ifc",
+   "seconds": 0.6,
+   "ours": {
+    "total_wall_m": 3008.955,
+    "exterior_wall_m": 574.073,
+    "interior_wall_m": 2434.882,
+    "door_mean_m": 0.972,
+    "door_max_m": 2.702,
+    "door_min_m": 0.865,
+    "window_max_m": 1.0,
+    "window_min_m": 1.0,
+    "door_nominal_mean_m": 0.936,
+    "door_nominal_max_m": 1.83,
+    "door_nominal_min_m": 0.865,
+    "skirting_m": 4560.704
+   },
+   "compared": {},
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "digital_hub_arc.ifc",
+   "seconds": 0.3,
+   "ours": {
+    "total_wall_m": 1925.093,
+    "exterior_wall_m": 1416.183,
+    "interior_wall_m": 508.91,
+    "door_mean_m": 1.141,
+    "door_max_m": 2.27,
+    "door_min_m": 0.87,
+    "window_max_m": 6.0,
+    "window_min_m": 2.0,
+    "door_nominal_mean_m": 0.996,
+    "door_nominal_max_m": 1.635,
+    "door_nominal_min_m": 0.8,
+    "skirting_m": 1663.071
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": 1416.18,
+     "ours": 1416.183,
+     "outcome": "right"
+    },
+    "interior_wall_m": {
+     "key": 508.91,
+     "ours": 508.91,
+     "outcome": "right"
+    },
+    "door_mean_m": {
+     "key": 1.0,
+     "ours": 1.141,
+     "outcome": "wrong",
+     "nominal": 0.996,
+     "nominal_outcome": "right"
+    },
+    "door_max_m": {
+     "key": 1.64,
+     "ours": 2.27,
+     "outcome": "wrong",
+     "nominal": 1.635,
+     "nominal_outcome": "right"
+    },
+    "door_min_m": {
+     "key": 0.8,
+     "ours": 0.87,
+     "outcome": "wrong",
+     "nominal": 0.8,
+     "nominal_outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 178,
+   "spaces_footprint_vs_qto": 56
+  },
+  {
+   "file": "duplex_arc.ifc",
+   "seconds": 0.1,
+   "ours": {
+    "total_wall_m": 327.063,
+    "exterior_wall_m": 245.53,
+    "interior_wall_m": 81.533,
+    "door_mean_m": 0.883,
+    "door_max_m": 1.25,
+    "door_min_m": 0.762,
+    "window_max_m": 4.835,
+    "window_min_m": 0.75,
+    "door_nominal_mean_m": 0.822,
+    "door_nominal_max_m": 0.864,
+    "door_nominal_min_m": 0.762,
+    "skirting_m": 319.514
+   },
+   "compared": {
+    "skirting_m": {
+     "key": null,
+     "ours": 319.514,
+     "outcome": "wrong"
+    }
+   },
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_hotel_1_arc.ifc",
+   "seconds": 0.1,
+   "ours": {
+    "total_wall_m": 335.834,
+    "exterior_wall_m": 335.834,
+    "interior_wall_m": null,
+    "door_mean_m": 0.983,
+    "door_max_m": 1.21,
+    "door_min_m": 0.35,
+    "window_max_m": 1.524,
+    "window_min_m": 0.6,
+    "door_nominal_mean_m": 0.921,
+    "door_nominal_max_m": 1.21,
+    "door_nominal_min_m": 0.3,
+    "skirting_m": 332.325
+   },
+   "compared": {},
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_hotel_2_arc.ifc",
+   "seconds": 0.1,
+   "ours": {
+    "total_wall_m": 891.034,
+    "exterior_wall_m": 716.038,
+    "interior_wall_m": 174.996,
+    "door_mean_m": 1.555,
+    "door_max_m": 3.7084,
+    "door_min_m": 0.8636,
+    "window_max_m": 1.8,
+    "window_min_m": 0.85,
+    "door_nominal_mean_m": 1.14,
+    "door_nominal_max_m": 1.7,
+    "door_nominal_min_m": 0.9,
+    "skirting_m": 171.534
+   },
+   "compared": {},
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_office_building_1_arc.ifc",
+   "seconds": 0.2,
+   "ours": {
+    "total_wall_m": 330.95,
+    "exterior_wall_m": 151.06,
+    "interior_wall_m": 179.89,
+    "door_mean_m": 1.151,
+    "door_max_m": 2.5,
+    "door_min_m": 0.885,
+    "window_max_m": 2.5,
+    "window_min_m": 1.01,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 774.3
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": 151.06,
+     "ours": 151.06,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 64,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_office_building_2_arc.ifc",
+   "seconds": 0.2,
+   "ours": {
+    "total_wall_m": 976.2,
+    "exterior_wall_m": 767.4,
+    "interior_wall_m": 208.8,
+    "door_mean_m": 1.435,
+    "door_max_m": 2.885,
+    "door_min_m": 0.89,
+    "window_max_m": 2.0,
+    "window_min_m": 1.1,
+    "door_nominal_mean_m": 1.053,
+    "door_nominal_max_m": 1.6,
+    "door_nominal_min_m": 0.8,
+    "skirting_m": 344.643
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": 767.4,
+     "ours": 767.4,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 105,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_office_building_3_arc.ifc",
+   "seconds": 0.2,
+   "ours": {
+    "total_wall_m": 1443.578,
+    "exterior_wall_m": 944.805,
+    "interior_wall_m": 498.773,
+    "door_mean_m": 0.98,
+    "door_max_m": 2.4749,
+    "door_min_m": 0.885,
+    "window_max_m": 2.0,
+    "window_min_m": 1.0,
+    "door_nominal_mean_m": 0.934,
+    "door_nominal_max_m": 2.01,
+    "door_nominal_min_m": 0.8,
+    "skirting_m": 965.534
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": null,
+     "ours": 944.805,
+     "outcome": "wrong"
+    }
+   },
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fantasy_residential_building_1_arc.ifc",
+   "seconds": 0.2,
+   "ours": {
+    "total_wall_m": 737.393,
+    "exterior_wall_m": 463.998,
+    "interior_wall_m": 273.395,
+    "door_mean_m": 1.45,
+    "door_max_m": 5.6315,
+    "door_min_m": 0.885,
+    "window_max_m": 2.014,
+    "window_min_m": 1.22,
+    "door_nominal_mean_m": 0.705,
+    "door_nominal_max_m": 0.705,
+    "door_nominal_min_m": 0.705,
+    "skirting_m": 586.531
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": 464.0,
+     "ours": 463.998,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "fzk_house_arc.ifc",
+   "seconds": 0.1,
+   "ours": {
+    "total_wall_m": 109.66,
+    "exterior_wall_m": 85.6,
+    "interior_wall_m": 24.06,
+    "door_mean_m": 1.135,
+    "door_max_m": 2.01,
+    "door_min_m": 0.885,
+    "window_max_m": 2.0,
+    "window_min_m": 1.0,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 136.19
+   },
+   "compared": {
+    "door_min_m": {
+     "key": 0.885,
+     "ours": 0.885,
+     "outcome": "right"
+    },
+    "window_max_m": {
+     "key": 2.0,
+     "ours": 2.0,
+     "outcome": "right"
+    },
+    "window_min_m": {
+     "key": 1.0,
+     "ours": 1.0,
+     "outcome": "right"
+    },
+    "exterior_wall_m": {
+     "key": 85.6,
+     "ours": 85.6,
+     "outcome": "right"
+    },
+    "interior_wall_m": {
+     "key": 24.06,
+     "ours": 24.06,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 13,
+   "spaces_footprint_vs_qto": 7
+  },
+  {
+   "file": "hitos_arc.ifc",
+   "seconds": 1.2,
+   "ours": {
+    "total_wall_m": 3837.432,
+    "exterior_wall_m": null,
+    "interior_wall_m": null,
+    "door_mean_m": 1.167,
+    "door_max_m": 3.5,
+    "door_min_m": 0.79,
+    "window_max_m": 19.5483,
+    "window_min_m": 0.49,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 4358.28
+   },
+   "compared": {
+    "exterior_wall_m": {
+     "key": null,
+     "ours": null,
+     "outcome": "abstained"
+    }
+   },
+   "walls_axis_vs_qto": 0,
+   "spaces_footprint_vs_qto": 0
+  },
+  {
+   "file": "molio_arc.ifc",
+   "seconds": 1.0,
+   "ours": {
+    "total_wall_m": 1612.24,
+    "exterior_wall_m": 724.26,
+    "interior_wall_m": 887.98,
+    "door_mean_m": 1.021,
+    "door_max_m": 2.9553,
+    "door_min_m": 0.91,
+    "window_max_m": 3.972,
+    "window_min_m": 0.5085,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 2386.119
+   },
+   "compared": {
+    "door_max_m": {
+     "key": 2.9553,
+     "ours": 2.9553,
+     "outcome": "right"
+    },
+    "window_max_m": {
+     "key": 3.972,
+     "ours": 3.972,
+     "outcome": "right"
+    },
+    "exterior_wall_m": {
+     "key": 724.3,
+     "ours": 724.26,
+     "outcome": "right"
+    },
+    "interior_wall_m": {
+     "key": 888.0,
+     "ours": 887.98,
+     "outcome": "right"
+    }
+   },
+   "walls_axis_vs_qto": 187,
+   "spaces_footprint_vs_qto": 117
+  },
+  {
+   "file": "smiley_west_arc.ifc",
+   "seconds": 0.2,
+   "ours": {
+    "total_wall_m": 1576.585,
+    "exterior_wall_m": 993.66,
+    "interior_wall_m": 454.485,
+    "door_mean_m": 1.275,
+    "door_max_m": 1.99,
+    "door_min_m": 0.76,
+    "window_max_m": 1.215,
+    "window_min_m": 0.75,
+    "door_nominal_mean_m": null,
+    "door_nominal_max_m": null,
+    "door_nominal_min_m": null,
+    "skirting_m": 1825.308
+   },
+   "compared": {},
+   "walls_axis_vs_qto": 270,
+   "spaces_footprint_vs_qto": 140
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+data/
+out/
+_vendor/
+__pycache__/

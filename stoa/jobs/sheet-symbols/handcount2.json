@@ -1,0 +1,95 @@
+{
+ "_doc": "Toilet and urinal counts by eye on the held-out sheets of the v2 split (kinds cof, sprc, ssa), from renders at 2 to 4 times the sheet scale. None of these sheets was used to tune the labels or the thresholds (cof p47 and sprc Tier 1 p3 of handcount.json were). cof p53 is left out: it mixes not-to-scale key plans with small restrooms and a detail at 3/16 in, so its true count is not clear. index is the 0-based page. The sprc sheets share one restroom core per size, so they are not independent plans.",
+ "sheets": [
+  {
+   "pdf": "cof__COF_Standard_Design_Rev_6.0_dated_20260522.pdf",
+   "index": 47,
+   "toilet": 4,
+   "urinal": 1
+  },
+  {
+   "pdf": "cof__COF_Standard_Design_Rev_6.0_dated_20260522.pdf",
+   "index": 48,
+   "toilet": 5,
+   "urinal": 2
+  },
+  {
+   "pdf": "cof__COF_Standard_Design_Rev_6.0_dated_20260522.pdf",
+   "index": 50,
+   "toilet": 9,
+   "urinal": 6
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_FULL_TIER1_Sep_2021.pdf",
+   "index": 1,
+   "toilet": 8,
+   "urinal": 3
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_FULL_TIER1_Sep_2021.pdf",
+   "index": 4,
+   "toilet": 8,
+   "urinal": 3
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_FULL_TIER2_Sep_2021.pdf",
+   "index": 1,
+   "toilet": 8,
+   "urinal": 3
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_FULL_TIER2_Sep_2021.pdf",
+   "index": 2,
+   "toilet": 8,
+   "urinal": 3
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_FULL_TIER2_Sep_2021.pdf",
+   "index": 4,
+   "toilet": 8,
+   "urinal": 3
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_MEDIUM_Sep_2021.pdf",
+   "index": 1,
+   "toilet": 5,
+   "urinal": 1
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_MEDIUM_Sep_2021.pdf",
+   "index": 2,
+   "toilet": 5,
+   "urinal": 1
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_MEDIUM_Sep_2021.pdf",
+   "index": 4,
+   "toilet": 5,
+   "urinal": 1
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_TRADOC_RECONDITIONING_Sep_2021.pdf",
+   "index": 1,
+   "toilet": 3,
+   "urinal": 1
+  },
+  {
+   "pdf": "sprc__Design_Guide_SPRC_TRADOC_RECONDITIONING_Sep_2021.pdf",
+   "index": 2,
+   "toilet": 3,
+   "urinal": 1
+  },
+  {
+   "pdf": "ssa__SSA_Warehouse_Standard_Design.pdf",
+   "index": 1,
+   "toilet": 4,
+   "urinal": 0
+  },
+  {
+   "pdf": "ssa__SSA_Warehouse_Standard_Design.pdf",
+   "index": 3,
+   "toilet": 4,
+   "urinal": 0
+  }
+ ]
+}

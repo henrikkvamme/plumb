@@ -1,0 +1,992 @@
+[
+ {
+  "track": "Computer vision for raster floor plans (CubiCasa5K symbol and room detection for exact counts)",
+  "key_findings": [
+   {
+    "title": "CubiCasa5K: A Dataset and an Improved Multi-Task Model for Floorplan Image Analysis (Kalervo et al., SCIA 2019)",
+    "year": "2019",
+    "what": "5,000 mostly Finnish floor plans with polygon SVG annotations for 80+ categories. Split: 4,200 train / 400 val / 400 test (random). Image types: high_quality_architectural 3,732, high_quality 992, colorful 276. Baseline: ResNet-152 hourglass, 2 segmentation heads + 21 heatmaps. Test results: rooms mIoU 57.5, icons mIoU 55.7. Per-icon test IoU: window 66.8, door 53.6, toilet 62.8, sink 55.7, sauna bench 67.3, bathtub 26.7, closet 69.2. Polygonized output drops a lot, for example bathtub to 0.0. The loader (floortrans/loaders/house.py) has 52 raw icon names, including Toilet, Urinal, Sink variants, Bathtub/BathtubRound, Shower/ShowerCab/ShowerPlatform/ShowerScreen*, SaunaBench*, SaunaStove and WashingMachine. Its 'icons_selected' mapping drops Shower entirely. It has 65 raw room names, including Bath, Bedroom, Kitchen, Sauna, DraughtLobby and Outdoor. Room type is read from the SVG class 'Space <Type>'.",
+    "why_it_matters_for_stoa": "Stoa's cubicasa5k files (colorful-11397.png, high_quality_architectural-12232.png) follow the CubiCasa5K folder layout <type>/<id>/. The SVG ground truth very likely produced the question answers. So we can build per-class labels that match the templates exactly: windows, doors, toilets, sinks, Shower+ShowerCab+Bathtub, SaunaBench/SaunaStove, Bedroom/Bath/Sauna/Kitchen rooms and one box per floor drawing. Do not use the default 11-class icon mapping. It merges Toilet with Urinal and drops showers. Leakage: train.txt/val.txt/test.txt inside the zip list folders. Map every Stoa image id to its split before training.",
+    "source_url": "https://arxiv.org/abs/1904.01920",
+    "code_or_weights_available": "Code: https://github.com/CubiCasa/CubiCasa5k (pretrained weights on Google Drive). Data: Zenodo record 2613548, one 5.5 GB zip, CC BY-NC-SA 4.0. Non-commercial only: fine for the hackathon, but a Stoa product would need permission."
+   },
+   {
+    "title": "OldDeLorean/rtdetr-floorplan-detector (RT-DETR-L on CubiCasa5K, part of Architect-Ant arXiv:2606.10953)",
+    "year": "2026",
+    "what": "Unmodified Ultralytics RT-DETR-L (32.8M params), trained on the official CubiCasa5K split (4,200 train) for 60 epochs at 1024x1024. AdamW, cosine schedule, flips. Took about 2.3 h on 2xA100. Official 400-image test set, AP50 / AP50:95: door 89.8/57.5, window 89.3/62.2, wall 82.3/52.8, railing 55.0/27.4. Pixel IoU vs the CubiCasa5K baseline: door 66.4 vs 52.0. Inference about 0.1 s/image on GPU and about 2 s on CPU. The authors warn that heavily furnished plans give false positives.",
+    "why_it_matters_for_stoa": "This is the best measured anchor for our time budget. It answers the key question: a 1024px transformer detector trains in about 2.3 h on 2xA100, or about 4-5 h on 1xA100, and reaches about 90 AP50 on doors and windows. Its weights can serve as a zero-training baseline for door and window counts tonight. They have no fixture classes.",
+    "source_url": "https://github.com/OldDeLorean/rtdetr-floorplan-detector",
+    "code_or_weights_available": "Yes. weights/rtdetr_l_autoresearch_60ep.pt (66 MB FP16), plus train/eval/predict scripts. No repo licence is stated, and Ultralytics is AGPL-3.0. There is no CubiCasa-to-YOLO converter in the repo."
+   },
+   {
+    "title": "heypaprika/gdino: Grounding DINO zero-shot vs fine-tuned vs YOLOv8s/YOLOX-s on CubiCasa5K",
+    "year": "2025-2026 (exact date not shown)",
+    "what": "Zero-shot Grounding DINO-tiny on 400 CubiCasa5K test plans gets mAP50 = 0.0. Every symbol under 40 px is missed, and 53% of the boxes cover whole rooms or floors (321x too large for doors). After fine-tuning on 1,500 plans plus a class-token scoring fix it reaches 39.3 mAP50. The specialists were trained on only 1,500 train plans at 1024px. YOLOv8s (80 ep) gets mAP50 67.1, with AP50 (detection rate): door 86.7 (97%), window 84.6 (97%), sauna_bench 83.0 (95%), toilet 63.2 (94%), sink 60.8 (88%), bathtub 39.8 (67%), shower 18.4 (64%). YOLOX-s (Apache-2.0) gets 65.7 mAP50, with sink 74.8 and bathtub 44.7.",
+    "why_it_matters_for_stoa": "Strong evidence that open-vocabulary detectors are useless zero-shot on CubiCasa symbols, and that a small supervised YOLO wins. It also gives per-class difficulty for exactly our templates. Showers and bathtubs are the weak classes, so plan extra work there: higher resolution, full 4,200-image train set, crop classifier or Claude check. The 97% per-object detection rate on doors and windows means exact counts on a plan with about 10 doors are far from certain.",
+    "source_url": "https://github.com/heypaprika/gdino",
+    "code_or_weights_available": "Code public on GitHub. Weights not confirmed. YOLOv8s is AGPL-3.0, YOLOX and Grounding DINO are Apache-2.0."
+   },
+   {
+    "title": "AECV-Bench: Benchmarking Multimodal Models on Architectural and Engineering Drawings Understanding (arXiv:2601.04819)",
+    "year": "2026",
+    "what": "Counting benchmark on 120 floor plans, partly from CubiCasa5K, for doors, windows, bedrooms and toilets, plus 192 drawing QA pairs. Frontier VLMs reach about 0.74-0.91 exact match on bedrooms and toilets, which come from text tags. Doors and windows lag at about 0.09-0.39 exact match, often 0.40-0.55 on a looser measure, with 20-50% MAPE. OCR-style QA reaches up to 0.95.",
+    "why_it_matters_for_stoa": "Direct evidence that frontier VLMs fail at symbol counting, so our current 'Claude places one point per object' method will be weak on doors and windows. The same models do well on text-labelled room counts. This supports a split design: a trained detector for symbols, OCR or a VLM for room labels such as MH/KH/PH/SAUNA.",
+    "source_url": "https://arxiv.org/abs/2601.04819",
+    "code_or_weights_available": "Code and data release not confirmed on the abstract page."
+   },
+   {
+    "title": "MuraNet: Multi-task Floor Plan Recognition with Relation Attention (arXiv:2309.00348)",
+    "year": "2023",
+    "what": "Attention-based shared backbone with separate segmentation and detection heads, trained on CubiCasa5K at 1536x1536. Door/window detection mAP50 91.7 vs 89.6 for YOLOv3. It used a custom split and about 1,000 epochs, according to the RT-DETR repo.",
+    "why_it_matters_for_stoa": "Shows that about 90 AP50 on doors and windows is the plateau, and that high input resolution (about 1536) matters for small symbols. Use it as a reference number only.",
+    "source_url": "https://arxiv.org/abs/2309.00348",
+    "code_or_weights_available": "No code released (per the RT-DETR repo comparison)."
+   },
+   {
+    "title": "Raster2Seq: Polygon Sequence Generation for Floorplan Reconstruction (SIGGRAPH 2026, arXiv:2602.09016)",
+    "year": "2026",
+    "what": "Autoregressive corner-sequence decoder for room polygons. RoomF1 88.7 on CubiCasa5K. Training took 19.4 h (stage 1) + 16.0 h (stage 2) on one RTX A6000. Inference about 0.52 s/image. The paper notes that CubiCasa5K annotations are noisy and that rooms overlap.",
+    "why_it_matters_for_stoa": "A pretrained CubiCasa5K room-polygon model is downloadable. It can segment rooms for the bedroom, bathroom and kitchen counts and for verification overlays without our own training. Retraining is out of budget (35 h).",
+    "source_url": "https://github.com/Cornell-VAILab/Raster2Seq",
+    "code_or_weights_available": "Code MIT. Weights on HF haopt/Raster2Seq (key 'cubicasa5k'), CC BY-NC 4.0, commercial use explicitly not allowed."
+   },
+   {
+    "title": "Raster-to-Graph: Floorplan Recognition via Autoregressive Graph Prediction with an Attention Transformer (EG 2024)",
+    "year": "2024",
+    "what": "Predicts wall junctions and segments autoregressively as a structural graph, with room semantics. The authors release a dataset of more than 10,000 residential floor plans.",
+    "why_it_matters_for_stoa": "An alternative path to room vectorization. Of lower priority than a detector for count questions.",
+    "source_url": "https://github.com/SizheHu/Raster-to-Graph",
+    "code_or_weights_available": "Code public on GitHub. Licence not checked."
+   },
+   {
+    "title": "xmarva/floorplan-detection (MMDetection on CubiCasa5K, walls and rooms)",
+    "year": "2025",
+    "what": "Cascade R-CNN R101 / RetinaNet fine-tuned on CubiCasa5K for wall and room boxes, with box AP 0.474 / AP50 0.634 on the val set. Includes notebooks/cubicasa5k_to_coco.ipynb, which converts the SVGs to COCO boxes (4,200/400/400). It keeps boxes only and drops masks.",
+    "why_it_matters_for_stoa": "A ready SVG-to-COCO converter we can adapt tonight instead of writing a parser from scratch. Extend it with fixture classes and floor boxes.",
+    "source_url": "https://github.com/xmarva/floorplan-detection",
+    "code_or_weights_available": "Code MIT. Weights on Google Drive (cascade 712 MB). Data CC BY-NC."
+   },
+   {
+    "title": "Public Hugging Face floor-plan detectors (v1nz/yolo11-floorplan-det, SamirShabani/Architect, mudasir13cs/floorcad-yolov8n-detect)",
+    "year": "2025",
+    "what": "v1nz: YOLO11s on CubiCasa5K for wall, door and window at 640px, test mAP50 0.411 (weak, the resolution is too low). Architect: YOLOv8m on FloorPlanCAD (28 classes including toilet, sink, bath, bathtub, doors and windows) at 640px, self-reported mAP50 0.877, CC BY-NC 4.0. floorcad-yolov8n: 35 FloorPlanCAD classes, AGPL-3.0. Dataset v1nz/cubicasa5k-yolo is a YOLO polygon conversion (wall/door/window only).",
+    "why_it_matters_for_stoa": "None of them covers our full CubiCasa template set at adequate resolution. The FloorPlanCAD models have a different drawing style (Chinese CAD). Useful only as weak baselines or to warm-start. Training our own is required.",
+    "source_url": "https://huggingface.co/SamirShabani/Architect",
+    "code_or_weights_available": "Weights public on HF. Licences CC BY-NC 4.0 (v1nz, Architect) and AGPL-3.0 (floorcad)."
+   },
+   {
+    "title": "RF-DETR (Roboflow, ICLR 2026, arXiv:2511.09554)",
+    "year": "2025-2026",
+    "what": "DINOv2-backbone real-time DETR. Sizes N/S/M/L are Apache-2.0: COCO AP50:95 48.4/53.0/54.7/56.5, RF100-VL 57.7-62.2, T4 latency 2.3-6.8 ms. RF-DETR-Seg is also Apache-2.0. XL/2XL use the PML licence. A Roboflow-hosted RF-DETR-Base is trained on the 'cubicasa5k-2' Universe dataset (4,978 images, 3-4 classes).",
+    "why_it_matters_for_stoa": "A permissively licensed alternative to Ultralytics AGPL, with a strong fine-tuning prior on domain-shifted data (RF100-VL). RF-DETR-M or L is a good second model to ensemble with YOLO for count voting.",
+    "source_url": "https://github.com/roboflow/rf-detr",
+    "code_or_weights_available": "Yes. pip install rfdetr. Apache-2.0 for N/S/M/L and all Seg sizes."
+   },
+   {
+    "title": "D-FINE (real-time DETR with fine-grained distribution refinement)",
+    "year": "2024-2025",
+    "what": "Sizes N/S/M/L/X, 4M-62M params, COCO AP 42.8-55.8 (59.3 with Objects365 pretraining), T4 latency 2.1-12.9 ms. Custom COCO-format fine-tuning configs are provided.",
+    "why_it_matters_for_stoa": "Another Apache-2.0 detector option. Lower priority than YOLO or RF-DETR because its tooling is less turnkey for a 36 h build.",
+    "source_url": "https://github.com/Peterande/D-FINE",
+    "code_or_weights_available": "Code Apache-2.0. Objects365 checkpoints may carry Objects365 terms."
+   },
+   {
+    "title": "Ultralytics YOLO26 (also YOLO11/YOLOv12 in the same package)",
+    "year": "2025-2026",
+    "what": "Sizes n-x, 2.4M-55.7M params, COCO mAP50:95 40.9-57.5 at 640px. NMS-free one-to-one head (nms=False), STAL small-target label assignment, optional P2 small-object head config (no pretrained weights), -seg and -obb variants. Licence AGPL-3.0 or Enterprise.",
+    "why_it_matters_for_stoa": "The fastest path to a trained CubiCasa detector: YOLO txt labels, one CLI command, built-in imgsz 1280-1536 and mosaic augmentation. Small-target assignment fits 20-40 px sinks and toilets. AGPL is acceptable for a hackathon demo, but flag it for any Stoa product.",
+    "source_url": "https://docs.ultralytics.com/models/yolo26/",
+    "code_or_weights_available": "Yes, pip ultralytics. AGPL-3.0."
+   },
+   {
+    "title": "SAM 3: Segment Anything with Concepts (arXiv:2511.16719) and SAM-based floor-plan room segmentation (CIB 2025)",
+    "year": "2025",
+    "what": "SAM 3 does promptable concept segmentation from noun phrases or exemplars and is integrated in Ultralytics (SAM3SemanticPredictor). I found no published evaluation on floor plans or technical drawings. A CIB 2025 paper (Purdue repository) uses the original SAM with generated visual prompts, from as few as 5 reference plans, plus GPT-4 labelling to segment rooms and doors on CubiCasa5K.",
+    "why_it_matters_for_stoa": "Given Grounding DINO's 0.0 mAP zero-shot on CubiCasa, expect weak text-prompted results on symbols. SAM or SAM 3 is more useful as a mask refiner: clicking a room centroid gives a room polygon for the verification overlay. Do not rely on it for counts.",
+    "source_url": "https://arxiv.org/abs/2511.16719",
+    "code_or_weights_available": "SAM 3 weights released by Meta (SAM licence, check the terms). CIB paper code not found."
+   },
+   {
+    "title": "Florence-2-large (Microsoft) for OCR_WITH_REGION",
+    "year": "2024",
+    "what": "0.77B params, MIT licence. Tasks include <OCR_WITH_REGION> (text with quad boxes), <OD> and phrase grounding. COCO OD AP 37.5-43.4.",
+    "why_it_matters_for_stoa": "Finnish CubiCasa plans write room abbreviations in the image (MH bedroom, KH/PH/PESUH bathroom, WC, K/KK/KT kitchen, S/SAUNA, VH). A TUM report notes the CubiCasa model itself relies on these text labels. OCR plus a regex dictionary can answer the bedroom, bathroom, sauna, kitchen and separate-WC templates at almost $0, with text boxes as visual citations. PaddleOCR is an alternative.",
+    "source_url": "https://huggingface.co/microsoft/Florence-2-large",
+    "code_or_weights_available": "Yes, MIT licence."
+   },
+   {
+    "title": "SymPoint / SymPoint-V2 on FloorPlanCAD (vector panoptic symbol spotting)",
+    "year": "2024",
+    "what": "Point-based panoptic symbol spotting on vector CAD primitives. SymPoint-V2 reaches 90.1 PQ on FloorPlanCAD with the layer prior, and 83.2 PQ without it.",
+    "why_it_matters_for_stoa": "Vector-only (needs SVG/DXF primitives), so it does not apply to CubiCasa PNGs. It may matter for swiss_dwellings DXF or opening_design vector PDFs. Our DXF block/layer tools probably already cover those at $0.",
+    "source_url": "https://github.com/nicehuster/SymPointV2",
+    "code_or_weights_available": "Code public on GitHub (arXiv:2407.01928). Licence not checked."
+   }
+  ],
+  "concrete_recipe": "GOAL: replace \"Claude places points\" for the cubicasa5k templates with a trained symbol detector and an OCR room-label reader. Claude becomes only the reviewer of uncertain boxes. Short answer to the key question: yes. One A100 can train a 1280-1536px YOLO or RT-DETR on the 4,200-image CubiCasa train split in about 3-5 h. The reference point is RT-DETR-L: 60 epochs at 1024px in 2.3 h on 2xA100, giving about 90 AP50 on doors and windows. Exact counts are harder than AP50, so tune for counts directly.\n\nSTEP 0 - data and leakage audit (Fri night, about 1.5 h, 1V100 $0.24/h or CPU). Download Zenodo 2613548 (cubicasa5k.zip, 5.5 GB, CC BY-NC-SA 4.0) on a Verda VM. Read train.txt/val.txt/test.txt. Map every Stoa cubicasa5k filename (<type>-<id>.png) to its CubiCasa split, and print the distribution for the 320 preview drawings. Adapt xmarva's cubicasa5k_to_coco notebook and CubiCasa's house.py into a converter that writes YOLO and COCO labels for these classes: window, door, toilet (Toilet only, Urinal separate), sink (Sink/SideSink/RoundSink/CornerSink/DoubleSink*), bathtub (Bathtub/BathtubRound), shower (Shower/ShowerCab/ShowerPlatform; ShowerScreen as an optional class), sauna_bench, sauna_stove, plus floor (bbox of each floor group in the SVG) and room boxes or polygons by type (Bedroom, Bath, Sauna, Kitchen, other).\n\nSTEP 1 - template calibration (1 h, CPU). For preview drawings, compute SVG-derived counts per template and compare them with the Stoa answers. Example questions: do double doors count as 2, and does \"showers+bathtubs\" equal Shower+ShowerCab+Bathtub? This fixes the class-to-template mapping. It is calibration only. Never look up a CubiCasa SVG by filename at inference, which would be answer leakage and a disqualification risk. Write this down in the pitch.\n\nSTEP 2 - train (Sat 00:00-06:00, unattended). Use 1A100.22V ($2.37/h, --hours 7), or 2xA100 ($4.75/h) to halve the time. Main model: Ultralytics YOLO11m or YOLO26m, imgsz 1280 (try 1536 if VRAM allows), 100-150 epochs, batch 16, mosaic on, fliplr and flipud, 90-degree rotation augmentation, rect=False, using F1_scaled.png. Train only on the CubiCasa train split, minus any Stoa preview ids if we want a clean in-house test. Second model in parallel on the same VM, or a 4V100 ($0.98/h): RF-DETR-M or L (Apache-2.0) at 704-1024px. Estimated wall time 3-5 h each, about $10-25 total. Fallback for tonight: download the OldDeLorean RT-DETR-L weights for doors and windows only.\n\nSTEP 3 - count tuning (Sat morning, 2 h). On the CubiCasa val split plus the Stoa preview images that lie in the test or val split, choose the per-class confidence threshold that maximizes exact-count accuracy, not mAP. Add flip TTA and SAHI tiling (1024 tiles, 20% overlap) for images over 2,000 px. Use weighted box fusion of the YOLO and RF-DETR outputs. Flag a count as \"uncertain\" when it changes across thresholds 0.3-0.6 or when the two models disagree.\n\nSTEP 4 - room templates via text (Sat, 3 h, parallel worker). Run Florence-2-large <OCR_WITH_REGION> (MIT) or PaddleOCR on the plan. Normalize the tokens with a regex dictionary: MH -> bedroom; KH/PH/PESUH/SH -> bathroom; WC -> separate WC; K/KK/KT/KEITTI\u00d6 -> kitchen; S/SAU/SAUNA -> sauna. Counting \"MH\" tokens with distinct positions gives the bedroom count. Cross-check with detector evidence (sauna_bench means a sauna exists, toilet inside a WC label region). Floors: count floor-group detections, or connected drawing clusters, plus \"1. KRS/2. KRS\" text.\n\nSTEP 5 - integrate into Drawing Desk (Sat afternoon). A new raster tool count_symbols(image, class) returns boxes with scores. The answer equals the number of accepted boxes, and every box is a citation in the existing zoom UI: numbered overlays, uncertain boxes drawn dashed. Only uncertain items go to Claude Haiku 5.5 as small crops (\"is this a toilet? yes/no\"), and Opus is not called for counts. The deterministic verifier checks that count == len(cited boxes).\n\nSTEP 6 - evaluate (Sat evening). Report exact-match per template on Stoa preview questions whose images lie in the CubiCasa test/val split and were not in training. Report the train-split images separately as \"seen\".\n\nEXPECTED ACCURACY: these are estimates, not measured. Doors and windows: 97% per-object detection at 1500-plan training gives maybe 60-80% exact on plans with about 10 openings. Toilets, sinks and saunas (1-3 per plan): maybe 80-90% exact. Showers and bathtubs: weakest, about 40-70%, with Claude crop review needed. OCR room counts: maybe 85-95%. For comparison, frontier VLMs get 0.09-0.39 exact on doors and windows (AECV-Bench).\n\nCOST PER QUESTION: detector inference about 10-30 ms on a V100 ($0.24/h), well under $0.0001/question, or about 1-2 s on CPU. OCR is similar. Optional Haiku crop review on about 20-30% of questions adds roughly $0.001-0.003 each. One-off training is about $10-25 of Verda credit. That is also the \"trained on Verda\" story.",
+  "risks": [
+   "Train/test leakage: Stoa's cubicasa5k images are CubiCasa5K images, and the full Stoa set probably contains most or all of the 5,000. A detector trained on CubiCasa train inflates accuracy on any hidden question about a train-split image. Report accuracy only on test/val-split images, and say so openly in the pitch.",
+   "Answer lookup by filename against the CubiCasa SVGs would give near 100% but is cheating. Use the SVGs for training labels and template calibration only.",
+   "Licences: CubiCasa5K is CC BY-NC-SA 4.0 on Zenodo (non-commercial, share-alike), so derived weights are non-commercial. Ultralytics YOLO is AGPL-3.0. Raster2Seq weights are CC BY-NC. Fine for a hackathon, but a Stoa work-trial product needs RF-DETR, YOLOX or D-FINE (Apache) and a data licence.",
+   "AP50 is not exact-count accuracy: one miss or one false positive on a plan with 10+ doors makes the answer wrong. Thresholds must be tuned for exact counts, and uncertain cases sent for review.",
+   "Template semantics may not match the SVG classes: double doors as 1 or 2, door 'with leaf' vs opening, shower screens, urinals vs WC seats, balconies. Calibrate against the preview answers before training, or the model learns the wrong definition.",
+   "Shower and bathtub are rare and drawn in many styles (reported AP50 18-45). Expect the lowest accuracy there.",
+   "Small symbols (<40 px) in large images: 640px training fails (v1nz YOLO11s only 0.41 mAP50). Use imgsz 1280-1536 or tiling, which raises VRAM use and training time.",
+   "CubiCasa5K annotations are known to be noisy and incomplete (Raster2Seq and other papers note overlapping rooms and missing labels). Some Stoa answers may themselves be off, and an exact count can still be marked wrong.",
+   "Domain shift: a detector trained on Finnish CubiCasa style will not transfer to swiss_dwellings PNGs or historic scans without extra data. Route those to the DXF/PDF vector tools instead.",
+   "Open-vocabulary detectors (Grounding DINO, OWLv2, Florence-2 OD, SAM 3 text prompts) should not be the counting engine. Grounding DINO gets 0.0 mAP50 zero-shot on CubiCasa symbols.",
+   "Time: the 36 h budget allows one solid training run plus one retry. Start the VM tonight and set --hours with margin. Delete VMs after pulling the weights."
+  ]
+ },
+ {
+  "track": "Fine-tuning small open VLMs (pointing / counting-by-pointing) for raster drawing QA - CubiCasa5K first",
+  "key_findings": [
+   {
+    "title": "Molmo and PixMo: open weights and data, counting by pointing",
+    "year": "2024",
+    "what": "Molmo answers count questions by emitting one numbered point per object (text tags, coords 0-100, ordered top-down/left-right), then the total. PixMo-Points has 2.3M question-points pairs on 223k images. Table 1: CountBenchQA / PixMo-Count test = Molmo-7B-D 88.5 / 84.8, MolmoE-1B 87.2 / 79.6, GPT-4o 87.9 / 59.6, Qwen2-VL-72B 80.4 / 55.7. An ablation shows that training with ordered points beats unordered points.",
+    "why_it_matters_for_stoa": "This is the exact mechanism Drawing Desk already uses with Claude (count = len(points)). Here it comes from a small model that is trained for it. Each point is a visible, checkable piece of evidence for the 'visualize reasoning' criterion. Use the point format (ordered, numbered) for our own SFT targets.",
+    "source_url": "https://arxiv.org/abs/2409.17146",
+    "code_or_weights_available": "Weights on HF (e.g. allenai/Molmo-7B-D-0924, Apache-2.0, research/educational use per Ai2 guidelines). The card says vLLM <=0.7.2 because of a preprocessing bug."
+   },
+   {
+    "title": "Molmo2: open VLMs with video, pointing and grounding (Molmo2-4B / 8B / O-7B)",
+    "year": "2025-12 (paper 2026)",
+    "what": "Qwen3 backbones (4B, 8B) or OLMo-3-7B, SigLIP2 encoder. Points use 0-1000 coords with object indices, and the last index is the count. Table 6, CountBench / PixMo-Count: Molmo2-4B 93.9 / 88.1, Molmo2-8B 93.7 / 88.5, Qwen3-VL-4B 85.5 / 58.0, Qwen3-VL-8B 90.4 / 65.0, GPT-5 90.8 / 67.2, Gemini 3 Pro 96.1 / 90.0. Point-Bench average: Molmo2-8B 68.7 vs Qwen3-VL 58.5. vLLM supported from v0.15.0. The repo has full pretrain and SFT scripts and checkpoints for every stage. LoRA is not mentioned, and the examples use 8 GPUs.",
+    "why_it_matters_for_stoa": "This is the strongest zero-shot counting-by-pointing baseline at 4B. Run it on the preview CubiCasa questions in the first 2-3 hours, before any training. It is the fallback if our fine-tune does not beat it. Full SFT with the Molmo2 codebase is heavier than a LoRA on Qwen.",
+    "source_url": "https://arxiv.org/abs/2601.10611",
+    "code_or_weights_available": "Yes. Code at https://github.com/allenai/molmo2 (Apache-2.0). Weights at https://huggingface.co/allenai/Molmo2-8B (Apache-2.0, but the card warns that some training data is non-commercial research only)."
+   },
+   {
+    "title": "MolmoPoint: better pointing with grounding tokens",
+    "year": "2026-03",
+    "what": "Replaces text coordinates with tokens that cross-attend to image patches (patch, then subpatch, then location), plus a 'no-more-points' class. PointBench 70.7% (SOTA), ScreenSpot-Pro 61.1%. Other reports say counting drops slightly (CountBench -0.8, PixMo-Count -0.9) and sample efficiency is better.",
+    "why_it_matters_for_stoa": "Shows that the field is moving pointing into the architecture. Do not build on it in 36 h. The point head is the part that 'next year's frontier models' will not make obsolete for symbol-dense drawings.",
+    "source_url": "https://arxiv.org/abs/2603.28069",
+    "code_or_weights_available": "The abs page does not confirm a weights release. The Molmo2 repo has MOLMO_POINT_README.md and a 'molmo_point' SFT config."
+   },
+   {
+    "title": "Qwen3.5 Small (0.8B/2B/4B/9B), natively multimodal",
+    "year": "2026-03",
+    "what": "Apache-2.0, early-fusion vision, Gated DeltaNet hybrid. Qwen3.5-4B model card: CountBench 96.3, RefCOCO avg 88.1, OCRBench 85.0, CharXiv-RQ 70.8, RefSpatialBench 54.6. The 9B gets 97.2 / 89.7 / 89.2 / 73.0. Qwen3.5-2B CountBench 91.4/86.8 and 0.8B 77.0/68.6 (0.8B card). It needed vLLM main or nightly at release. Unsloth bf16 LoRA VRAM: 0.8B 3 GB, 2B 5 GB, 4B 10 GB, 9B 22 GB. LLaMA-Factory has qwen3_5 templates.",
+    "why_it_matters_for_stoa": "This is the best quality-per-parameter open base for SFT: strong OCR (needed for Finnish room labels such as MH, KH, PH, SAUNA) plus point/box grounding. The 4B fits LoRA training on 1xA100 with lots of headroom, and serving it costs a fraction of a cent per question.",
+    "source_url": "https://huggingface.co/Qwen/Qwen3.5-4B",
+    "code_or_weights_available": "Weights Apache-2.0 on HF and ModelScope. Supported by Unsloth, LLaMA-Factory and vLLM."
+   },
+   {
+    "title": "Qwen3-VL Technical Report",
+    "year": "2025-11",
+    "what": "Grounding with both boxes and points, in relative 0-1000 coordinates (Qwen2.5-VL used absolute pixels). The counting data is a subset of the grounding data, with direct, box-based and point-based counting, and it includes PixMo points. The Qwen3-VL-8B-Thinking chart shows CountBench 91.5 and 4B-Thinking 89.4. Molmo2's own eval gives Qwen3-VL-8B PixMo-Count only 65.0.",
+    "why_it_matters_for_stoa": "Qwen3-VL-4B/8B is the safer fallback base if Qwen3.5 tooling breaks: Unsloth has Qwen3-VL SFT and GRPO notebooks. Its weak PixMo-Count result (dense counting) shows that zero-shot Qwen will under-count doors and windows, so in-domain SFT is needed. Users report coordinates above 1000, so clamp and validate.",
+    "source_url": "https://arxiv.org/abs/2511.21631",
+    "code_or_weights_available": "Weights Apache-2.0 (Qwen3-VL 2B-235B). Cookbook in QwenLM/Qwen3-VL. Coordinate pitfalls in https://github.com/QwenLM/Qwen3-VL/issues/1486"
+   },
+   {
+    "title": "Perception-R1: GRPO for perception (counting via detect-then-count)",
+    "year": "2025 (NeurIPS 2025)",
+    "what": "Qwen2-VL-2B, GRPO with a Hungarian-matched point-distance reward plus a format reward, trained on 10k PixMo-Count samples. PixMo-Count val/test 60.2/50.5 -> 78.1/75.6. Ablations: SFT only 58.0/59.9, with a thinking step 74.9/72.8 (thinking hurts), without reward matching 77.1/75.4. lr 1e-6, 8 rollouts, KL 0.04. GPU-hours not reported.",
+    "why_it_matters_for_stoa": "This is the template for our RL reward: points matched to the SVG-derived ground truth, plus exact count. Two lessons: no chain-of-thought for counting, and RL helped where generic SFT did not. Counting training code is not released, so write the reward ourselves (about 40 lines).",
+    "source_url": "https://arxiv.org/abs/2504.07954",
+    "code_or_weights_available": "https://github.com/linkangheng/PR1 (Apache-2.0). Weights Kangheng/PR1-Qwen2-VL-2B-Counting on HF. Only the grounding training code is released."
+   },
+   {
+    "title": "Visual-RFT: Visual Reinforcement Fine-Tuning",
+    "year": "2025 (ICCV 2025)",
+    "what": "GRPO with rule-based IoU and classification rewards on Qwen2-VL-2B/7B, and on Qwen2.5-VL since May 2025. One-shot fine-grained classification +24.3% with about 100 samples. Few-shot detection +21.9 on COCO 2-shot and +15.4 on LVIS. 8-GPU ZeRO-3 example. About 200 steps are enough for a few hundred samples.",
+    "why_it_matters_for_stoa": "Evidence that a few hundred to a few thousand verifiable examples move perception a lot. That fits a 36 h budget.",
+    "source_url": "https://arxiv.org/abs/2503.01785",
+    "code_or_weights_available": "https://github.com/Liuziyu77/Visual-RFT. Code Apache-2.0, data CC BY-NC 4.0."
+   },
+   {
+    "title": "VLM-R1: stable, generalizable R1-style VLM",
+    "year": "2025",
+    "what": "GRPO on Qwen2.5-VL-3B for REC and OVD. In-domain REC improves steadily over 100-600 steps, while SFT barely moves. Out of domain, SFT degrades and RL generalizes. Supports LoRA GRPO and InternVL. The example uses 8 GPUs with ZeRO-3.",
+    "why_it_matters_for_stoa": "A ready GRPO trainer with grounding rewards on the best-tested VLM (Qwen2.5-VL). It is an alternative to TRL if Qwen3.5 GRPO breaks.",
+    "source_url": "https://github.com/om-ai-lab/VLM-R1",
+    "code_or_weights_available": "Apache-2.0. Qwen2.5-VL-3B checkpoints released. Paper https://arxiv.org/abs/2504.07615"
+   },
+   {
+    "title": "PointRL: point-level grounding from verifiable annotation evidence",
+    "year": "2026-08",
+    "what": "Turns existing boxes, masks and instance labels into pointing prompts. A hidden verifier checks parseability, point validity, instance coverage, count match and redundant or missing points. Base Qwen3.5-4B. PointArena overall 56.11% -> 65.58%.",
+    "why_it_matters_for_stoa": "This is our recipe on our chosen base model. CubiCasa5K SVG polygons are exactly this kind of 'hidden verifier evidence'. The reward terms (coverage, count match, no duplicates) map directly to our counting reward.",
+    "source_url": "https://arxiv.org/abs/2608.25299",
+    "code_or_weights_available": "No code or weights linked on the abs page."
+   },
+   {
+    "title": "AECV-Bench: multimodal models on architectural drawings",
+    "year": "2026-01",
+    "what": "Counts doors, windows, bedrooms and toilets on 120 floor plans, plus 192 drawing QA pairs. Models: Claude Opus 4.5, Gemini 3 Pro, GPT-5.2, Qwen3-VL-8B, GLM-4.6V and others. OCR-style QA reaches up to 0.95. Door and window counting is 'often 0.40-0.55' exact accuracy, and symbol counting 'remains unsolved'. The authors recommend tool-augmented, domain-specific approaches.",
+    "why_it_matters_for_stoa": "External evidence that frontier models alone fail at exactly the 76%-of-questions task. This justifies a domain-trained pointer and is a strong pitch line. Per-model CSVs are in the repo.",
+    "source_url": "https://arxiv.org/abs/2601.04819",
+    "code_or_weights_available": "https://github.com/AECFoundry/AECV-Bench (data licence not stated)"
+   },
+   {
+    "title": "CubiCasa5K annotations (SVG) - the training signal",
+    "year": "2019",
+    "what": "5,000 Finnish plans, more than 80 categories, 5.5 GB zip, train/val/test split files. The house.py parser shows the SVG groups: id='Door', id='Window' (polygons, endpoints taken from 4 corners), 'FixedFurniture <Icon>' (Toilet, Urinal, Sink variants, Bathtub, Shower/ShowerCab/ShowerPlatform, SaunaBench*, SaunaStove, ...) and 'Space <Room>' polygons (Bedroom, Bath, Sauna, Kitchen, ...). Licence CC BY-NC-SA 4.0.",
+    "why_it_matters_for_stoa": "Every preview count question type (windows, doors, WC seats, sinks, shower+bathtub, saunas, kitchens, bedrooms, bathrooms) can be computed from the SVG. This gives exact point targets (icon centroids, door and window midpoints, room label centroids) and EN/FI QA with free ground truth. Stoa's own answers were probably generated the same way, so calibrate against them.",
+    "source_url": "https://zenodo.org/records/2613548",
+    "code_or_weights_available": "Parser and code: https://github.com/CubiCasa/CubiCasa5k (floortrans/loaders/house.py). Data CC BY-NC-SA 4.0."
+   },
+   {
+    "title": "Swiss Dwellings dataset",
+    "year": "2022",
+    "what": "More than 42.5k apartments, 250k rooms, about 1.5M separators and 670k openings as WKT geometry in metres, with room types. CC BY 4.0.",
+    "why_it_matters_for_stoa": "Swiss questions also ship DXF, so the existing native DXF tools should answer them at $0. Use the geometry only to make extra raster pointing data (doors, windows, toilets on rendered PNGs) if the PNG path is ever needed. Licence allows commercial use.",
+    "source_url": "https://zenodo.org/records/7215005",
+    "code_or_weights_available": "Data CC BY 4.0. The Archilyse pipeline code is AGPL."
+   },
+   {
+    "title": "TRL GRPOTrainer: VLM support",
+    "year": "2025-2026",
+    "what": "Tested VLMs: Gemma3-4B, LLaVA-NeXT, Qwen2-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B. Qwen3-VL is listed only for agent training. Losses: dapo (default), dr_grpo, grpo, sapo. GSPO via importance_sampling_level='sequence'. vLLM colocate or server mode. QLoRA via quantization_config plus peft_config. The example is grpo_visual_math.py.",
+    "why_it_matters_for_stoa": "The quickest path to a custom point reward with a plain Python reward function. Compatibility with Qwen3.5 is not guaranteed, so test it in hour 1 of the RL phase, or fall back to Qwen2.5-VL-3B.",
+    "source_url": "https://huggingface.co/docs/trl/main/en/grpo_trainer",
+    "code_or_weights_available": "Apache-2.0"
+   },
+   {
+    "title": "Unsloth vision SFT and RL (GRPO/GSPO)",
+    "year": "2025-2026",
+    "what": "Notebooks for Qwen3-VL-8B GRPO (4-bit, LoRA r16, max_seq_length 16384, fits a T4), Qwen2.5-VL-7B and Gemma-3-4B. vLLM fast_inference cannot apply LoRA to vision layers, so set finetune_vision_layers=False during RL. Example config: dr_grpo, 8 generations, lr 5e-6. Known Qwen2.5-VL 'addCriterion' gibberish, fixed with a reward penalty. The Qwen3.5 fine-tune guide covers vision SFT.",
+    "why_it_matters_for_stoa": "The lowest-VRAM option. SFT and RL of a 4B model fit easily on 1xA100 80GB, so no multi-GPU ZeRO setup is needed.",
+    "source_url": "https://unsloth.ai/docs/get-started/reinforcement-learning-rl-guide/vision-reinforcement-learning-vlm-rl",
+    "code_or_weights_available": "Apache-2.0. Qwen3.5 guide: https://unsloth.ai/docs/models/qwen3.5/fine-tune"
+   },
+   {
+    "title": "LLaMA-Factory supports Qwen3.5 and Qwen3-VL",
+    "year": "2026",
+    "what": "Templates qwen3_5 / qwen3_5_nothink (0.8B-397B) and qwen3_vl. LoRA, QLoRA, DoRA. A YAML config can unfreeze the vision tower for grounding (freeze_vision_tower: false).",
+    "why_it_matters_for_stoa": "A config-only SFT route if Unsloth has a Qwen3.5-vision bug. Multimodal JSON dataset format, so we write data once.",
+    "source_url": "https://github.com/hiyouga/LlamaFactory",
+    "code_or_weights_available": "Apache-2.0"
+   },
+   {
+    "title": "vLLM multimodal throughput on A100 (issue #24728) and Volta support",
+    "year": "2025-2026",
+    "what": "1xA100 40GB, ShareGPT4V images, unlimited rate: Qwen2.5-VL-7B 13.24 req/s, InternVL3.5-4B 15.61, InternVL3.5-2B 26.26, MiniCPM-V-4 17.59. At concurrency 1, about 1 req/s. RedHat's Qwen2.5-VL-7B card (older vLLM 0.7.2) reports about 0.7 QPS on 1680x2240 document images and about 2.6 QPS at 640x480, so resolution dominates. Several 2026 sources say current vLLM needs compute capability >= 7.5. V100 is 7.0 and has no bf16.",
+    "why_it_matters_for_stoa": "Gives the cost model. Do not plan on V100s for Qwen3.5 or Molmo2 serving or bf16 training. Use 1xA100 80GB or the free chili RTX 5090.",
+    "source_url": "https://github.com/vllm-project/vllm/issues/24728",
+    "code_or_weights_available": "n/a (benchmark). Doc-image numbers: https://huggingface.co/RedHatAI/Qwen2.5-VL-7B-Instruct-quantized.w4a16"
+   },
+   {
+    "title": "FloorplanVLM: SFT then GRPO for floor plan vectorization",
+    "year": "2026-02",
+    "what": "Generates JSON wall, door and window geometry from floor plan rasters. SFT, then GRPO with geometric rewards. Floorplan-2M and HQ-300K data. 92.52% external-wall IoU on FPBench-2K. The base model is not named on the abs page.",
+    "why_it_matters_for_stoa": "Domain confirmation that SFT plus GRPO with geometric verifiable rewards works on floor plans. Only the benchmark is promised as open.",
+    "source_url": "https://arxiv.org/abs/2602.06507",
+    "code_or_weights_available": "Only FPBench-2K is promised. No code or weights."
+   },
+   {
+    "title": "Engineering-drawing fine-tune evidence, mixed: MechVQA and Blueprint2CAD",
+    "year": "2026",
+    "what": "MechVQA: 3.3K mechanical drawings and 21K QA pairs. MechVL beats the strongest closed model by 7.57 points after multi-stage training. Blueprint2CAD: zero-shot VLMs score 0.52-0.67 on drawing/render verification. LoRA adds only 'a few points' and makes the model's biases stronger.",
+    "why_it_matters_for_stoa": "Domain fine-tuning helps when the target is perceptual and well defined (counting symbols). It helps little for hard 3D reasoning. Keep the VLM narrow (point at symbol X) and leave the reasoning to Claude and the native tools.",
+    "source_url": "https://arxiv.org/abs/2605.30794",
+    "code_or_weights_available": "MechVQA: the GitHub link is mentioned but not shown on the abs page. Blueprint2CAD (https://arxiv.org/abs/2611.02433): no release link."
+   },
+   {
+    "title": "Other small-VLM options checked",
+    "year": "2024-2026",
+    "what": "InternVL3.5 1B/2B/4B/8B (InternViT-300M + Qwen3; fast in vLLM, see above). Gemma 4 (2026-04; E2B, E4B, 12B, 26B-A4B, 31B; Apache-2.0; image budget 70-1120 tokens; pointing quality not reported). Florence-2 base 0.23B / large 0.77B (MIT; <OD>, <OCR_WITH_REGION> tasks; good as a cheap box detector or OCR, but no QA). PaliGemma 2 (3B/10B/28B at 224/448/896 px; a fine-tune base for detection). SmolVLM2 2.2B/500M/256M (Apache-2.0; DocVQA 80.0, ChartQA 68.8; no counting numbers).",
+    "why_it_matters_for_stoa": "None of these beats Qwen3.5-4B or Molmo2-4B on published counting and grounding. Florence-2-large is a cheap ensemble partner: a box detector for the same classes gives a second, independent count to cross-check the VLM points.",
+    "source_url": "https://arxiv.org/abs/2508.18265",
+    "code_or_weights_available": "Gemma 4: https://ai.google.dev/gemma/docs/core/model_card_4. Florence-2: https://huggingface.co/microsoft/Florence-2-large. SmolVLM2: https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct"
+   }
+  ],
+  "concrete_recipe": "GOAL: a small fine-tuned \"pointer\" VLM that answers CubiCasa raster count questions (53% of all preview questions) with one numbered point per object. Claude stays the router, the text-answer model and the fallback. IFC, DXF and Swiss questions stay on the native $0 tools.\n\nHARDWARE: 1x A100 80GB ($2.37/h) for everything. Optionally a second A100 for parallel baselines. Do not use V100s: no bf16, and current vLLM likely needs compute capability >= 7.5. The chili RTX 5090 (free) can serve the final 4B model.\n\nH0-3 (CPU, local) - data builder.\n1. Download CubiCasa5K (5.5 GB, Zenodo 2613548). Parse model.svg with the logic in CubiCasa's house.py.\n   - Door and window midpoints come from id='Door' / id='Window' polygons.\n   - Icon centroids come from 'FixedFurniture X' (Toilet, Sink*, Bathtub*, Shower*, SaunaBench*/SaunaStove).\n   - Room label points come from 'Space X' polygons (Bedroom, Bath, Sauna, Kitchen, and so on).\n   - Check how storeys/floors are encoded in the SVG.\n2. Map every preview question template (EN + Finnish) to one SVG query. Generate targets in Molmo style: points sorted top-down, left-to-right, then the count. Coordinates are 0-1000 relative (Qwen3.x convention), with no reasoning text (Perception-R1: thinking hurts counting).\n3. CALIBRATE: match the preview cubicasa drawings to CubiCasa5K IDs. Compare the SVG-derived counts with Stoa's answers for each type. Fix definitions until agreement is at least 95% (for example \"door with leaf\", \"showers+bathtubs\", which room codes count as KH/PH/PESUH/SH).\n4. HOLD OUT every drawing that appears in questions.jsonl (preview, and full set when available) plus the CubiCasa test split. Train only on the rest: about 4k images x about 8 questions = about 30k samples. Add about 10% negative questions where the answer is 0 and there are no points.\n\nH2-5 (A100, in parallel with step 3) - zero-shot baselines on 500 held-out preview count questions with vLLM.\n- Models: Molmo2-4B and Molmo2-8B (native counting-by-pointing; PixMo-Count 88.1/88.5), and Qwen3.5-4B and Qwen3.5-9B with a \"point to each X, return JSON point_2d\" prompt.\n- Compare with the current Claude point-placement pipeline: exact-match rate and $/question.\n- This gives the first real accuracy number and selects the base model.\n\nH5-11 - SFT.\n- Base: Qwen3.5-4B (Apache-2.0). Fallback: Qwen3-VL-4B, or Qwen2.5-VL-3B (best tested in TRL, VLM-R1 and PR1).\n- Tool: Unsloth FastVisionModel, or LLaMA-Factory with template qwen3_5.\n- Settings: LoRA r=32, alpha=64, on language plus vision layers (grounding benefits from an unfrozen vision tower). lr 1e-4 to 2e-4, 1 epoch, bf16. Image max about 1.6 MP (about 1.5k visual tokens). Very large plans are tiled into 2x2 overlapping crops with points merged by radius.\n- Expected VRAM is about 10-30 GB. Time is ESTIMATED at 3-5 h for 20-30k samples (not measured; cut to 15k samples if throughput is low).\n- Merge the LoRA into the base weights. vLLM cannot apply LoRA to vision layers.\n\nH11-13 - evaluation on the held-out set.\n- Exact match per question type, point precision/recall (Hungarian matching, radius = 1.5% of the image diagonal), and failure gallery images for the UI.\n\nH13-21 (optional, only if doors and windows still lag) - GRPO/GSPO.\n- Tool: TRL GRPOTrainer or Unsloth (vision layers frozen when vLLM generates).\n- Reward = 1.0 x exact count + 0.5 x point F1 (Hungarian) + 0.2 x format - duplicate penalty. These are the PointRL and Perception-R1 terms.\n- Run on about 2k hard prompts where the SFT model was wrong. 8 generations, lr 1e-6 to 5e-6, KL 0-0.04, about 300 steps.\n- ESTIMATED 4-6 h on 1-2 A100s. Stop early if held-out accuracy does not rise within 100 steps.\n\nH21-28 - serving.\n- Run vLLM (A100 or chili 5090) behind a Drawing Desk tool point_count(image, class) -> numbered points.\n- Use the vLLM prefix cache, so all questions on one drawing share the image prefill.\n- Confidence check: two samples (or full image vs tiles), plus a Florence-2-large detector count if time allows. If the counts disagree, escalate to Claude Opus with the candidate points drawn on the image.\n- The UI shows numbered dots and lets the user add or remove a point to recount. This gives judges the verifiable-reasoning view.\n\nH28-34 - pitch numbers.\n- Report accuracy (held-out) and $/question for each route. Publish the weights on HF as a non-commercial derivative and name the Verda training run.\n\nEXPECTED ACCURACY: no published number exists for this task. The references:\n- Frontier models score 0.40-0.55 on door/window counting (AECV-Bench).\n- Molmo2-4B reaches 88% on natural-image PixMo-Count.\n- In-domain RL took a 2B model from 50.5% to 75.6% on PixMo-Count.\n- Hypothesis to verify at H11: at least 90% exact on low-count icon classes (WC, sink, sauna, kitchen) and 70-85% on doors and windows, about 85% over all CubiCasa counts.\n\nCOST (ESTIMATES):\n- Training total about $20-40: SFT about $10, GRPO about $12, baselines and eval about $10.\n- Self-hosted 4B on A100: at a conservative 3-10 questions/s with about 1.5k image tokens and 100-300 output tokens, $2.37/3600/(3-10) = about $0.00007-0.0002 per question. This holds only while the GPU is busy. An idle A100 costs $57/day, which is why the chili box matters.\n- Claude Opus 5.5 ($4/$20 per MTok): a single call with about 3.5k input and about 1.5k output (points plus thinking) costs about $0.045. A 3-5 turn tool loop costs about $0.1-0.3.\n- Claude Haiku 5.5 ($0.10/$0.50): about $0.001.\n- So the fine-tuned pointer is about 200-1000x cheaper than Opus and about 5-15x cheaper than Haiku 5.5, and it is more accurate only if the H11 eval shows it.",
+  "risks": [
+   "Train/test leakage and integrity: the cubicasa5k drawings in the Stoa set very likely ARE CubiCasa5K images, and the answers were likely derived from the same SVGs. Training on their annotations inflates scores, and judges may treat it as cheating. Exclude every drawing that appears in questions.jsonl from training. Report only held-out accuracy, and state this in the pitch.",
+   "Licence: CubiCasa5K is CC BY-NC-SA 4.0, so the fine-tuned weights are effectively non-commercial and share-alike. Molmo2 training data also contains non-commercial sources, and Visual-RFT data is CC BY-NC. This is acceptable for a hackathon demo, but must be disclosed to Stoa (work-trial context).",
+   "Label-definition mismatch between the SVG classes and Stoa's templates (doors with leaf, showers+bathtubs grouping, KH/PH/PESUH/SH room codes, storeys, windows drawn as one or several segments). Without calibration against the 4,270 preview pairs, the model learns the wrong definition and exact-match accuracy collapses.",
+   "Tooling newness: Qwen3.5 is a Gated DeltaNet hybrid. TRL's tested VLM list does not include Qwen3-VL or Qwen3.5, and Unsloth's vision-RL page does not name Qwen3.5. Budget 1 h to smoke-test SFT and GRPO, then fall back to Qwen3-VL-4B or Qwen2.5-VL-3B.",
+   "vLLM cannot apply LoRA to vision layers, so merge before serving. During vLLM-backed GRPO the vision tower must stay frozen. Molmo2 repo fine-tuning is full-parameter only (no LoRA mentioned) and uses 8-GPU examples.",
+   "V100 is a trap: no bf16, no FlashAttention 2, and current vLLM reportedly needs compute capability >= 7.5. Use A100 or the RTX 5090.",
+   "Small symbols on large plans: downscaling to about 1.5 MP can erase door swings and WC symbols. Tiling fixes recall but creates duplicate points at tile seams, which need radius-based merging. Coordinate bugs are common (Qwen2.5-VL absolute pixels vs Qwen3.x relative 0-1000; Qwen3-VL users report values above 1000).",
+   "Over-promising: Perception-R1's generic SFT gave no counting gain, and Blueprint2CAD found LoRA adds only a few points on hard drawing tasks. In-domain SFT on dense point labels should do better, but nothing is measured until H11. Keep the Claude point-placement pipeline as the fallback.",
+   "Time: GRPO can consume 8+ hours for little gain. Gate it on the H11 eval and stop if held-out accuracy is flat after 100 steps.",
+   "Cost narrative: the advantage over Claude Haiku 5.5 is only about 5-15x, and per-question GPU cost assumes a saturated GPU. An idle A100 at $57/day loses to API calls at low volume. Present both numbers, and serve from the free chili box.",
+   "Coverage gaps: historic scans (habs, finna, europeana, wikimedia) and US vector drawing sets are out of distribution for a CubiCasa-trained pointer. Route them to Claude and the native tools, not the fine-tune.",
+   "Some sources (MolmoPoint weights, AECV-Bench per-model numbers, FloorplanVLM base model) could not be confirmed from the pages fetched. Treat those details as unverified."
+  ]
+ },
+ {
+  "track": "Research landscape: question answering over AEC drawings and BIM (2024-2026). Covers benchmarks, frontier VLM scores, failure modes, hybrid methods that win, and IFC-Bench v2 grading.",
+  "key_findings": [
+   {
+    "title": "AECV-Bench: Benchmarking Multimodal Models on Architectural and Engineering Drawings Understanding (Kondratenko, Birhane, Hsain, Maciocci)",
+    "year": "2026 (arXiv v1 8 Jan 2026; repo results updated through current models)",
+    "what": "There are two tasks. (1) Counting doors, windows, spaces, bedrooms and toilets on 120 floor plans, scored by per-field exact match and MAPE. (2) 192 drawing-grounded QA pairs in four groups: OCR, instance counting, spatial and comparative. An LLM judge (GPT-4o) grades them, and humans settle edge cases. The abstract says OCR/text QA reaches up to 0.95 accuracy, while door and window counting 'remains unsolved (often 0.40-0.55)'. We recomputed exact-match accuracy from the repo CSVs, which show per-field results for current models. Door/Window/Bedroom/Toilet: Gemini 3.5 Flash 0.43/0.39/0.93/0.82 (MAPE door 12%, window 17%). Gemini 3 Pro 0.40/0.34/0.89/0.83. Claude Fable 5 0.36/0.29/0.93/0.82. GPT-5.5 0.30/0.28/0.93/0.77. Claude Opus 4.8 0.15/0.15/0.88/0.77. Claude Opus 4.5 0.16/0.16/0.91/0.76. Qwen3-VL-8B 0.09/0.10/0.76/0.81. 'Space' (room count) is 0.13-0.27 for every model. Cost per run of 120 plans: Fable 5 $9.22 ($0.077/plan, 29 s mean latency), GPT-5.5 $26.88 ($0.22/plan, 182 s), Gemini 3.5 Flash $3.77 ($0.031/plan).",
+    "why_it_matters_for_stoa": "This is the closest public match to the 76% raster-count slice. It shows that the strongest frontier VLMs get door/window counts exactly right on only about 30-43% of plans. Bedroom and toilet counts reach about 80-93%, because they come from labels and few, large symbols. So 'Claude places points' is a weak baseline for doors, windows and rooms, and a trained detector is where the accuracy is. The per-plan cost numbers also give a direct cost comparison for the low-inference-cost criterion.",
+    "source_url": "https://arxiv.org/abs/2601.04819 ; https://github.com/AECFoundry/AECV-Bench",
+    "code_or_weights_available": "The code, the 120 images, the ground truth and every model's raw outputs are public on GitHub. The repo has no LICENSE file, so reuse rights are unclear."
+   },
+   {
+    "title": "BIM Information Extraction Through LLM-based Adaptive Exploration (Hellin, Jang, Fuchs, Nousias, Borrmann, TU Munich) - introduces ifc-bench v2",
+    "year": "2026 (arXiv 3 May 2026; Automation in Construction)",
+    "what": "ifc-bench v2 has 1,027 QA tasks over 37 IFC models from 21 projects (Revit/ArchiCAD; IFC2X3, IFC4, IFC4X3). There are four categories: C1 direct retrieval, C2 aggregation/counting, C3 geometric/spatial, C4 incomplete information. The test split is a fixed 514 questions. The method is a CodeAct agent that writes IfcOpenShell Python in a sandbox, iterates, and abstains when it hits the iteration cap. GLM-4.7 (355B total, 32B active) scores 56.0% with no augmentation, against 19.1% for a static one-shot query (+37 pp, p<0.001). GLM-4.5-Air (106B/12B active) scores 25.7%. Doc retrieval, hand-written tools and auto-generated tools change the strong model by at most 0.6 pp, which is not significant. Per category for GLM-4.7: C1 55.6%, C2 53.4%, C3 66.7%, C4 57.8%. Materials questions reach only 42%. Per-project accuracy ranges from 25% to 90%.",
+    "why_it_matters_for_stoa": "Stoa's ifc_bench slice (249 free-text questions on 5 models) comes from this benchmark. Frontier agents score only about 55-60% on it, so an IfcOpenShell agent that explores step by step clearly beats one-shot query generation. Hand-written tools did not help a strong model. The paper's judge rubric is the de facto grading method for these free-text answers.",
+    "source_url": "https://arxiv.org/abs/2605.01698",
+    "code_or_weights_available": "Code: https://github.com/sylvainHellin/cobbie (CC BY 4.0). Data: https://huggingface.co/datasets/sylvainHellin/ifc-bench (QA CC BY 4.0; each IFC keeps its own licence, and four models are GPLv3). Agents run through API models, so there are no weights."
+   },
+   {
+    "title": "How IFC-Bench v2 free-text answers are graded (cobbie answer_verifier.baml)",
+    "year": "2026",
+    "what": "The grader is an LLM judge that sees the question, category, ground truth, system answer and execution trace. It first decides whether the system abstained. If not, it judges four binary criteria: faithfulness, completeness, transparency and relevance. Faithfulness rules for C1/C2: continuous values (length, area, volume) must be within 2% of the reference, and counts must match exactly. For C3, methodology must be disclosed and values must be plausible. For C4, assumptions must be stated. Transparency means every claim cites a specific property, method or assumption, for example '24 windows counted IfcWindow elements'. An answer is correct only if criteria 1-4 pass. In the repo, the default judge client in answer_verifier.baml is GLM_4_7. scripts/run_second_llm_judge.py adds a judge from a second family. The paper reports judge agreement of Krippendorff alpha 0.70-1.00, against 0.32-0.57 between human experts. The ONESTRUCTION Construction AI Leaderboard (7 Nov 2026) notes that the public code lets the model grade itself by default, so it fixed the judge to DeepSeek-V3.2. Its runs allow 15 code runs per question on the 514 test questions.",
+    "why_it_matters_for_stoa": "The Stoa scoring rules (counts exact, area/length/volume within 2%) match the ifc-bench rubric exactly, so Stoa probably follows it. To grade the 'text' type, we can copy this rubric with Haiku as judge. Our answers should also be written to pass 'transparency': name the IFC class and property, or the quantity set, behind each number. Drawing Desk citations already work this way.",
+    "source_url": "https://github.com/sylvainHellin/cobbie/blob/main/src/baml/baml_src/answer_verifier.baml ; https://huggingface.co/blog/ONESTRUCTION/construction-ai-leaderboard",
+    "code_or_weights_available": "Judge prompt and scripts are public under CC BY 4.0."
+   },
+   {
+    "title": "Construction AI Leaderboard (ONESTRUCTION, Hugging Face blog)",
+    "year": "2026 (7 Nov 2026)",
+    "what": "It covers five axes: AEC-Bench (drawings), BIM-Edit, IFC-Bench-V2, CEQuest and Ishigaki-IDS-Bench. Overall scores: Claude Opus 5.5 73.7, Gemini 4 Argon 73.6, Claude Opus 5 72.7, GPT-6.1 Sol 70.2, Sonnet 5.5 66.9. On AEC-Bench drawings, Opus 5.5 scores 70.2 at $0.33 and 1.7 min per task, and Sonnet 5.5 scores 58.6 at $0.14. Claude Opus 5 ranks first on IFC-Bench-V2, but the blog text gives no number for it.",
+    "why_it_matters_for_stoa": "These are current-generation results for the exact models we have. Opus 5.5 is the strongest drawing/document agent, and its per-task cost is useful for a cost comparison with our router.",
+    "source_url": "https://huggingface.co/blog/ONESTRUCTION/construction-ai-leaderboard",
+    "code_or_weights_available": "Not applicable (a leaderboard)."
+   },
+   {
+    "title": "AEC-Bench: A Multimodal Benchmark for Agentic Systems in AEC (Galanos/Aurecon, Mulyar/Nomic AI)",
+    "year": "2026 (1 Apr 2026)",
+    "what": "196 tasks in 9 families over real public drawing sets, specs and submittals: intra-sheet, intra-drawing and intra-project. Each is scored by an automated verifier with partial credit. Agents tested: Claude Code (Opus/Sonnet 4.6) and Codex (GPT-5.4/5.2), with and without Nomic parse/embedding tools. Note-callout defects that text can catch score 100%, but defects that need visual inspection score about 5%, and rendering images did not help. The best submittal-review score is 23.1. 77% of trajectories used pdftotext, which loses layout.",
+    "why_it_matters_for_stoa": "This confirms that agents fail on visual-spatial grounding, such as leader lines and matching text to geometry. It supports our approach of keeping text spans with bounding boxes from the vector PDF, not plain pdftotext.",
+    "source_url": "https://huggingface.co/papers/2603.29199 ; https://github.com/nomic-ai/aec-bench",
+    "code_or_weights_available": "Dataset, harness and evaluation are public under Apache-2.0."
+   },
+   {
+    "title": "DrawingVQA: real-world benchmark on construction drawings (Jung, Fu, Golparvar-Fard)",
+    "year": "2026 (16 Jul 2026)",
+    "what": "92 expert-written QA pairs (mostly multiple choice) on 33 issued-for-construction structural drawings. Overall: Gemini-3-pro 77.2%, Gemini-2.5-pro 71.7%, o3 58.7%, Claude-4.5-Sonnet 57.6%, Qwen3-VL-8B 53.3%, GPT-4o 48.9%. Professionals score 94.9%. Quantity takeoff (counting) is the weakest dimension for every model, at 0-58% on a small subset. Without the image, o3 drops to 29.5% and Gemini-2.5-flash to 9.8%. Failure modes: losing its place while tracing grid lines during counting, taking a callout from the neighbouring symbol, and stopping cross-referencing at the first plausible link.",
+    "why_it_matters_for_stoa": "This is more independent evidence that counting and quantity takeoff is where frontier VLMs break. It also shows that visible grounding (which symbol was counted) is what lets a human catch the error.",
+    "source_url": "https://arxiv.org/abs/2607.15418",
+    "code_or_weights_available": "Data at https://huggingface.co/datasets/S2-MIND/DrawingVQA (CC BY-NC-SA family licence). The paper names no code repo."
+   },
+   {
+    "title": "Getting to the Point: Pointing Improves LVLMs at Counting (Alghisi et al.)",
+    "year": "2026 (v2 28 May 2026)",
+    "what": "Point-then-Count (PtC): the model outputs coordinates first, then the count. After LoRA fine-tuning (rank 32, single A100 80GB, at most 2 days per experiment), PtC reaches about 99.9-100% in-distribution on synthetic data. On real OCID data PtC scores 76-82%, against 69-75% for direct counting. Out of distribution, counting the predicted points is much better than the model's stated final count. On synthetic OOD data, InternVL3.5-8B scores 97.9% when you count its points, against 45.5% for direct counting. Zero-shot, Molmo-7B-O gets 99.95% with PtC against 53% with direct counting.",
+    "why_it_matters_for_stoa": "This validates Drawing Desk's rule that count = len(points). It also shows that a small VLM fine-tuned to point at symbols is a viable trained component. Always count the emitted points, never the model's stated number.",
+    "source_url": "https://arxiv.org/abs/2603.21746",
+    "code_or_weights_available": "https://github.com/sislab-unitn/Getting-to-the-Point (CC BY 4.0)."
+   },
+   {
+    "title": "SAM 3: Segment Anything with Concepts (Meta)",
+    "year": "2025 (Nov 2025)",
+    "what": "An open-vocabulary concept segmenter. The table as reported by a third-party site gives CountBench 93.8% accuracy (MAE 0.12) against Gemini 2.5 Pro 92.4%, and PixMo-Count 86.2% against Molmo-72B 88.8%. Ultralytics docs give 95.6% and 87.3%. Only the 2-10 object range is tested.",
+    "why_it_matters_for_stoa": "It is a zero-training fallback detector for 'count all X'. Prompt it with 'toilet' or 'door', or with an exemplar crop, and it returns masks we can draw as evidence. It is untested on line-art floor plans, so measure it on CubiCasa before relying on it.",
+    "source_url": "https://arxiv.org/abs/2511.16719",
+    "code_or_weights_available": "Weights released by Meta under the SAM licence. Also packaged in Ultralytics."
+   },
+   {
+    "title": "Automated Facility Enumeration using Door Detection and LLMs (Zhang, Le, Akhtar, Ngo, U. Melbourne)",
+    "year": "2025 (26 Sep 2025)",
+    "what": "A Co-DETR detector feeds an LLM to count facilities across 8 floor-plan datasets. On CubiCasa5K toilet counting: 87.63% against GPT-5 at 85.57%. On kitchen: 98.97% against 96.91%. The gains are largest on unusual drawing styles, for example CVC-FP 86.7% against 40.0% and SESYD 95.8% against 68.8%.",
+    "why_it_matters_for_stoa": "This is a published detector-plus-LLM hybrid on the same CubiCasa source that beats a frontier VLM on counting. The largest gains come on plan styles outside the training data, which matters for 14,000 drawings from mixed sources.",
+    "source_url": "https://arxiv.org/abs/2509.17283",
+    "code_or_weights_available": "No code. The authors say the labels will be released later."
+   },
+   {
+    "title": "CubiCasa5K dataset (Kalervo et al.) and derived detection sets",
+    "year": "2019 dataset; derivatives 2025",
+    "what": "5,000 Finnish floor plans with dense SVG polygon annotations in more than 80 categories: rooms with type labels, doors, windows and icons such as toilet, sink, shower, bathtub and sauna bench. The split is about 4,200/400/400. The Zenodo zip is 5.47 GB, licensed CC BY-NC-SA 4.0. The original repo has a pretrained multi-task CNN with weights on Google Drive. Derivatives: HF v1nz/cubicasa5k-yolo (wall/door/window YOLO polygons, 1.76 GB, CC BY-NC 4.0, no icons). Roboflow cubicasa5k-2 has an RF-DETR-Base door/window/wall model at mAP50 74.6% (May 2025). TextCAD (arXiv 2607.12678) maps CubiCasa to 10 countable thing classes plus wall and railing.",
+    "why_it_matters_for_stoa": "Stoa's cubicasa5k slice is these plans, with question types that match the CubiCasa labels: WC seats, sinks, showers/bathtubs, saunas, doors, windows, room types. Training a detector and segmenter on the SVG ground truth is the most direct fix for the biggest accuracy gap. Some Stoa drawings may also be in CubiCasa train/val/test. Check by hash and hold those out, so accuracy measurements stay honest.",
+    "source_url": "https://arxiv.org/abs/1904.01920 ; https://github.com/CubiCasa/CubiCasa5k ; https://zenodo.org/record/2613548 ; https://huggingface.co/datasets/v1nz/cubicasa5k-yolo",
+    "code_or_weights_available": "Data: CC BY-NC-SA 4.0 (non-commercial). Original model weights on Google Drive. The GitHub repo licence is listed as 'Other'."
+   },
+   {
+    "title": "Grounded and Faithful P&ID Reasoning: Constraining VLMs with Recovered Evidence Graphs (Gadekar, Sakhinana, Runkana)",
+    "year": "2026 (v2 29 Oct 2026; NeurIPS 2026 VLM4RWD workshop)",
+    "what": "Pipeline: tiled symbol detection, then U-Net line masks, skeleton vectorization, YOLO text detection with fine-tuned TrOCR, and a connection graph. The VLM may only answer through 7 read-only graph operators and must cite their results. On TopoPID-VQA (3,000 topology questions), exact match rises from 36.7-41.3% with images only to 74.3-76.0%, using Qwen3-VL-4B/8B and Gemma-4-E4B. The remaining errors come from mistakes in the recovered graph.",
+    "why_it_matters_for_stoa": "This is the clearest 2026 evidence for Stoa's thesis. CV extracts a structured evidence graph, a small model queries it, and the cited query results are the visual proof. It is the same pattern as our IFC/DXF tools, extended to rasters.",
+    "source_url": "https://arxiv.org/abs/2609.05880",
+    "code_or_weights_available": "No code link. The paper is CC BY-NC-ND 4.0."
+   },
+   {
+    "title": "FloorplanQA: spatial reasoning in LLMs using structured representations (Rodionov et al.)",
+    "year": "2025 (ICML 2026)",
+    "what": "2,000 symbolic layouts (JSON/XML) and 16,000 QA pairs in 8 task types: distance, visibility, path finding, free space, placement and others. Ground truth is computed with shapely and A*. 15 LLMs are tested. The hardest tasks are free space, maximal rectangle and shortest path. Models fail at centroids of complex polygons. Giving the model a Python tool fixes the arithmetic errors.",
+    "why_it_matters_for_stoa": "Once a drawing is vectorized into polygons, do area and geometry in code (shapely), not in the LLM. This supports deterministic area tools for swiss_dwellings and ifc_models.",
+    "source_url": "https://github.com/OldDeLorean/FloorplanQA",
+    "code_or_weights_available": "Code public on GitHub. Licence not checked."
+   },
+   {
+    "title": "AECBench (ECADI + Tongji)",
+    "year": "2025 (v3 Feb 2026; Advanced Engineering Informatics)",
+    "what": "A Chinese text-only benchmark on AEC knowledge at 5 cognitive levels: memorization, understanding, reasoning, calculation, application. Across 9 LLMs, scores fall at each higher level. Models do worst on tables in building codes, calculations and document generation.",
+    "why_it_matters_for_stoa": "It is only indirectly relevant, because it has no drawings. It shows that calculation and table lookup are weak points, which supports doing arithmetic in tools.",
+    "source_url": "https://arxiv.org/abs/2509.18776",
+    "code_or_weights_available": "Data at https://huggingface.co/datasets/jackluoluo/AECBench (CC BY-NC 4.0)."
+   },
+   {
+    "title": "ArchCAD-400K and DPSS symbol spotter (Luo et al., Tongji); SymPointV2",
+    "year": "2025 (v3 Nov 2025); SymPointV2 2024",
+    "what": "413,062 chunks from 5,538 vector CAD drawings, 27 categories, line-level labels created by an automatic engine. The Dual-Pathway Symbol Spotter reaches 40.7% instance-spotting mAP, against SymPointV2 39.7% and SymPoint 30.8%. SymPointV2 works on SVG primitives and has weights on Google Drive.",
+    "why_it_matters_for_stoa": "These are the reference methods for counting symbols directly from vector primitives: DXF, and vector PDF from opening_design. The mAP is only about 40%, so on vector files, block names and layers (our DXF tools) are more reliable than learned spotting.",
+    "source_url": "https://arxiv.org/abs/2503.22346 ; https://github.com/ArchiAI-LAB/ArchCAD ; https://github.com/nicehuster/SymPointV2",
+    "code_or_weights_available": "ArchCAD data: CC BY-NC 4.0 on HF (jackluoluo/ArchCAD, 2.63 GB). DPSS code on GitHub. SymPointV2 has weights but no licence file."
+   },
+   {
+    "title": "Fine-Tuning VLM for Engineering Drawing Information Extraction (Khan et al.)",
+    "year": "2024 (Nov 2024; ICIAI 2025)",
+    "what": "Florence-2 (0.23B parameters), fully fine-tuned on 400 GD&T-annotated mechanical drawings. Against the better of GPT-4o and Claude-3.5-Sonnet zero-shot: F1 +52.4%, precision +29.95%, recall +37.75%, hallucination rate -43.15%. Training compute is not reported.",
+    "why_it_matters_for_stoa": "A small fine-tuned VLM beats frontier models on a narrow drawing extraction task with only 400 examples. This supports 'small fine-tuned model + frontier orchestrator', and Florence-2 is cheap to train on a V100.",
+    "source_url": "https://arxiv.org/abs/2411.03707",
+    "code_or_weights_available": "No code or weights linked. The paper is CC BY 4.0."
+   },
+   {
+    "title": "Natural Language Information Retrieval from BIM Models (Hellin, Nousias, Borrmann, EC3 2025) - IFC-Bench v1",
+    "year": "2025",
+    "what": "A ReAct agent with 29 hand-coded IfcOpenShell tools, working directly on IFC files: 80% on 99 queries, and 95% when the information exists directly in the model. Related systems: BIM-GPT (arXiv 2304.09333, prompt-based retrieval), Text2BIM (arXiv 2408.08054, multi-agent model generation, not QA), and BIMCoder (reported 87.16% match / 88.75% execution accuracy).",
+    "why_it_matters_for_stoa": "Accuracy collapses when questions move from direct lookups (about 95%) to computation and incomplete information (v2: about 55%). Our deterministic Qto/storey/space selectors cover the easy part at $0. An agent fallback with tool loops is needed for the long tail.",
+    "source_url": "https://mediatum.ub.tum.de/doc/1781947/66amsnnaqbygipuftj8b88oqv.2025_HELLIN_EC3.pdf",
+    "code_or_weights_available": "IFC-Bench v1 is in the same HF dataset (CC BY 4.0). The v1 GitHub repo is archived at https://github.com/sylvainHellin/ifc-bench."
+   },
+   {
+    "title": "MSD / Swiss Dwellings (van Engelenburg et al., ECCV 2024)",
+    "year": "2024",
+    "what": "Swiss Dwellings v3.0.0 (Zenodo 10.5281/zenodo.7788422): a dataframe of WKT polygons in metres for every room, wall, opening and balcony, with site/building/plan/floor/apartment/unit IDs and room types. MSD has 5,372 floor plans with a building-level train/test split. Both are CC BY 4.0.",
+    "why_it_matters_for_stoa": "The swiss_dwellings slice is rendered from this geometry. Room areas and counts can be computed exactly from the DXF/PDF vectors with shapely. The public dataframe lets us check our area extractor against the true polygons and the 2% tolerance.",
+    "source_url": "https://arxiv.org/abs/2407.10121 ; https://archilyse.standfest.science/swiss-dwellings",
+    "code_or_weights_available": "Data CC BY 4.0. Tooling AGPL."
+   },
+   {
+    "title": "Other 2026 drawing benchmarks found (context)",
+    "year": "2026",
+    "what": "MechVQA (ICML 2026, arXiv 2605.30794): 3.3K mechanical drawings and 21K QA. Its fine-tuned MechVL beats the best closed model by 7.57 pp. Base model and compute are not given on the abstract page. MMArch (arXiv 2608.09281): 1,212 items. Best proprietary MLLM 52%, best open model about 30%, experts 95%. IFCMemoryBench (arXiv 2607.26072), BIM-Edit (arXiv 2606.20146) and BIBIMBAP (arXiv 2611.09933) are BIM agent benchmarks. We found no papers named 'BlueprintQA', 'CAD-VQA', 'ArchiText' or 'DrawingQA'. The closest real ones are AECV-Bench, DrawingVQA and FloorplanQA.",
+    "why_it_matters_for_stoa": "The pattern is the same in every domain: fine-tuned small models or tool-grounded pipelines beat zero-shot frontier models on symbol-dense drawings, and the gap to human experts stays large.",
+    "source_url": "https://arxiv.org/abs/2605.30794 ; https://arxiv.org/abs/2608.09281",
+    "code_or_weights_available": "MechVQA code link was promised in v2 but not found. MMArch project page: https://dcx-swjtu.github.io/MMArch/"
+   }
+  ],
+  "concrete_recipe": "Goal: put a trained CV layer under the 76% raster-count slice, and keep the frontier model for routing, edge cases and explanation. The thesis comes from the literature (P&ID evidence graph +35 pp, adaptive IFC agent +37 pp, detector+LLM beats GPT-5 on CubiCasa): CV/geometry builds structured, citable evidence, and a model only queries it.\n\nSTEP 0 (hours 0-2, laptop). Build a harness on the preview set (7,990 Q).\n- Score with Stoa's rules: counts exact, measurements within 2%.\n- For text questions, use a copy of the ifc-bench judge. That means abstention, then faithfulness/completeness/transparency/relevance, correct only if criteria 1-4 pass, with Haiku 5.5 as judge. Prompt source: cobbie src/baml/baml_src/answer_verifier.baml.\n- Hash the Stoa cubicasa PNGs against the CubiCasa5K splits (Zenodo zip, 5.47 GB). Exclude every overlapping drawing from training, so preview accuracy stays honest.\n\nSTEP 1 (hours 1-4). Template router at $0.\n- The cubicasa questions are EN+FI templates in 11 types. Match them with regex or embeddings to a target class.\n- Swiss and IFC templates map to tool calls in the same way.\n- Haiku 5.5 handles only questions that match no template (about $0.0005/question).\n- Target: more than 95% of preview questions routed with no LLM call.\n\nSTEP 2 (hours 2-10). Train the raster detector on Verda.\n- Data: CubiCasa5K SVG to YOLO-seg labels. Classes: door (opening plus leaf), window, toilet/WC seat, sink/wash basin, shower, bathtub, sauna bench, kitchen counter/stove/fridge, and room polygons with type (bedroom, bathroom, WC, sauna, kitchen, living). Start from the HF v1nz/cubicasa5k-yolo conversion for wall/door/window, and add icon and room classes from the SVG ourselves.\n- Model: Ultralytics YOLO11m-seg (or YOLOv8m-seg) at imgsz 1280. Run RF-DETR-Base for comparison (Roboflow reports mAP50 74.6% on door/window/wall).\n- Hardware: 1A100.22V, about 4,200 train images, about 100 epochs. Our estimate is 2-4 h, about $5-10. That figure is not from a paper.\n- Optional, in parallel on 1V100 ($0.24/h): count room-label OCR tokens (MH, KH, WC, PH, SH, S, K, AVK) with PaddleOCR. Finnish plans name room types in text, and bedroom/toilet counts are what VLMs already get right (0.82-0.93 on AECV-Bench).\n- Floors/storeys: count connected plan components plus floor-label OCR (1. krs / 2. krs).\n\nSTEP 3 (hours 8-14). Calibrated hybrid counting.\n- Count = number of detections above a per-class threshold tuned on CubiCasa val to maximise exact-match count accuracy, not mAP.\n- Detections in the uncertain band (for example 0.25-0.5) go as crops to Haiku or Sonnet 5.5 for yes/no. This is a cheap, small number of crops.\n- Fall back to Claude point-placement (Point-then-Count, counting points, never the stated number) only when the detector is outside its domain: historic scans, US vector sets.\n- Expected accuracy: no paper reports exact-count accuracy for a CubiCasa-trained detector, so measure it. AECV-Bench gives the baseline to beat: frontier VLMs get door/window counts exactly right on 0.30-0.43 of plans. Bedroom/toilet reach 0.82-0.93.\n- Cost: YOLO inference about 20-50 ms/image on CPU, so about $0.0001/question. Compare Fable 5 at $0.077/plan and GPT-5.5 at $0.22/plan on AECV-Bench.\n\nSTEP 4 (parallel, hours 4-16). Vector and BIM slices.\n- swiss_dwellings: closed polylines and hatches from DXF, areas with shapely, room names from text entities.\n- ifc_models: Qto quantities or ifcopenshell geometry for slab volumes, spaces per storey.\n- ifc_bench free text: a CodeAct-style IfcOpenShell agent on Sonnet 5.5 with persistent state, up to 15 code runs, and abstention. Make the answer cite the IFC class, property set or quantity behind every number to pass the 'transparency' criterion.\n- Literature reference: GLM-4.7 scores 56% on the ifc-bench v2 test split. Opus 5 ranks first on the ONESTRUCTION leaderboard (number not published).\n\nSTEP 5 (hours 14-28). Verification UI and creativity.\n- For every raster count, draw each counted instance as a numbered box or mask over the plan, with confidence colours. Show 'reviewed by Claude' badges on uncertain ones and click-to-toggle so a human can fix it.\n- For areas, draw the polygon with its shoelace computation. For IFC, show the executed code and the entity GUIDs.\n- This mirrors the P&ID 'cite the graph query' pattern that judges can check visually.\n\nSTEP 6 (hours 28-34). Full-set evaluation.\n- Run a batch evaluation over the full 10 GB set's question files on the A100 (detector batch inference takes under an hour).\n- Report accuracy per source and type, plus measured $/question.\n- Pitch numbers: our counting exact-match against the AECV-Bench frontier baselines, and cost per question against Opus/Fable direct.\n\nTotal Verda spend: about $15-30 (1A100 roughly 6-10 h including evaluation, plus a V100 for OCR).",
+  "risks": [
+   "Licence: CubiCasa5K is CC BY-NC-SA 4.0 and the YOLO conversion is CC BY-NC 4.0. That is fine for a hackathon demo, but a detector trained on it cannot ship commercially. Say this in the pitch, because Stoa offers a work trial.",
+   "Leakage: some Stoa cubicasa drawings may be in CubiCasa5K train/val/test. A detector trained on them will overstate preview accuracy. Deduplicate by perceptual hash, hold out the overlap, and disclose it. Never look up ground truth.",
+   "Label-convention mismatch: Stoa's ground truth (for example 'doors with leaf', 'showers+bathtubs' grouped, windows per opening or per pane, bathrooms KH/PH/PESUH/SH) may not match CubiCasa SVG classes one to one. Calibrate the class mapping and thresholds on the preview questions, not only on CubiCasa val.",
+   "Exact-match counting is unforgiving. One missed door makes the answer wrong. A detector with good mAP can still have mediocre exact-count accuracy on plans with 10-20 doors. Tune thresholds for count accuracy and use LLM review of uncertain detections.",
+   "Domain shift: the full 10 GB set holds historic scans (habs, finna, europeana, wikimedia) and US vector sets. A CubiCasa detector will degrade there, so a confidence-based fallback to Claude pointing or SAM 3 is needed. SAM 3 is untested on line-art plans.",
+   "Unverified numbers: the AECV-Bench per-field accuracies above come from our own recomputation of the repo CSVs (exact integer match per field). They differ from the abstract's '0.40-0.55' wording, which may use another definition. Training time and cost estimates for YOLO are ours, not from a paper.",
+   "IFC-Bench free-text grading depends on the judge. Scores differ by judge model (the public code defaults to the answering model or GLM-4.7, and ONESTRUCTION fixed DeepSeek-V3.2). Stoa's own text grading is unknown ('no metric'), so optimise for the rubric criteria, not one judge.",
+   "We found no papers named BlueprintQA, CAD-VQA, ArchiText or DrawingQA. Do not cite them in the pitch.",
+   "Time: 36 hours is tight for data conversion (SVG to YOLO with icons and rooms), training, calibration, the UI and a full-set evaluation. Ship the template router and vector/IFC tools first, so the score does not depend on the detector."
+  ]
+ },
+ {
+  "track": "Exploiting vector structure (PDF vector paths, DXF/DWG, SVG) for symbol spotting and room/area extraction",
+  "key_findings": [
+   {
+    "title": "MEASURED ON PREVIEW: Swiss Dwellings DXF siblings are fully layered, so a deterministic solver already gets ~97% of Swiss questions at $0",
+    "what": "Every swiss_dwellings PDF has a same-stem DXF (65 pdf / 65 dxf / 65 png in the preview). It is written by ezdxf in metres ($INSUNITS=6) with semantic layers: ROOM_OUTLINE (closed LWPOLYLINE per room), UNIT_OUTLINE, ROOM_TEXT (name, room number like '5.11', and the area label '13.62 m\u00b2'), DOOR (one 5-vertex leaf rectangle + one ARC per door), WINDOW (3 rectangles per window), FIXTURE (48-vertex ellipses = WC bowls and basins, 69-vertex polylines = bathtubs), WALL hatches. I scored simple rules on all 2,358 Swiss preview questions (scripts in /private/tmp/claude-501/-repo/165be0a0-3c4e-47f1-97b0-ffd36f328f8d/scratchpad/vec/): room net area by number = shoelace area of the ROOM_OUTLINE that contains the number text: 256/256 within 2% (exact to 0.01 m\u00b2). Doors = count of 5-vertex DOOR polylines: 65/65 (ARC count only 37/65, double/sliding doors differ). Windows = WINDOW rectangles / 3: 65/65 (union-components only 49/65). Bathtubs = 69-vertex FIXTURE polylines: 56/56. Apartments = count of 'App. X' ROOM_TEXT labels: 65/65 (UNIT_OUTLINE count only 110/130). 'Rooms labelled X' = labels inside polygons: 662/675. Apartment net area (rooms inside unit outline, minus Balcone etc.): 106/112. Floor total net indoor area: 58/65 (needs a complete multilingual outdoor/shaft/void label list). WC + washbasin together = number of 48-vertex ellipses: 65/65, but the split WC vs basin needs one more rule (size/aspect or adjacent cistern rectangle). Showers not yet mapped.",
+    "why_it_matters_for_stoa": "Swiss is ~30% of preview questions (1,614 counts + 744 areas). They become exact, $0, millisecond answers, and each answer has a perfect visual proof: highlight the polygon, the label text and the shoelace formula, or the N door leaves. This is the strongest accuracy + verifiability + cost result available in this track.",
+    "source_url": "https://zenodo.org/records/7788422",
+    "code_or_weights_available": "No model needed. ezdxf (MIT) + shapely (BSD). Source data: Swiss Dwellings v3.0.0, Archilyse, CC BY 4.0.",
+    "year": "2023 dataset; measured 2026-11-13"
+   },
+   {
+    "title": "MEASURED: Swiss PDFs carry the same information as vector text and styled paths",
+    "what": "PyMuPDF on site1102_bldg2242_floor10281.pdf: no OCG layers, but 150 text words in reading order ('Stanza', '5.03', '10.15', 'm\u00b2', ...), 268 vector drawings with consistent style classes (e.g. 16 gray fills 0.69 = wall hatches, 21 stroke 0.27 = door arcs). The annotation text gives 'Scala 1:100 (A3) \u00b7 Misure in metri'; page is 1190.55 x 841.89 pt = A3, so 1 pt = 35.28 mm real. The printed area labels match the answers to 0.01 m\u00b2.",
+    "why_it_matters_for_stoa": "If a Swiss PDF in the hidden/full set had no DXF, the answer still comes deterministically from PDF text spans (area labels) or from PDF path polygons scaled by the stated 1:100. The existing Drawing Desk PDF span-citation machinery can cite the exact label bbox.",
+    "source_url": "https://pymupdf.readthedocs.io/",
+    "code_or_weights_available": "PyMuPDF (AGPL-3.0 or commercial licence) - fine for a non-commercial hackathon; pdfplumber/pypdfium2 are permissive alternatives.",
+    "year": "2026"
+   },
+   {
+    "title": "MEASURED: opening_design questions are schedule-table lookups on vector PDFs, not geometry",
+    "what": "All 64 opening_design preview questions come from 3 sheets: A-801 Door and Finish Schedules (41), A700 SCHEDULES (20), A-701 Restrooms (3). The PDFs (3024x2160 pt) have full text layers (1,885 / 2,222 / 645 words) and 5,800-23,700 vector drawings. PyMuPDF find_tables() finds 0 tables (Revit schedules are rotated and drawn as loose lines). But a regex over word tokens finds exactly 38 door ids (pattern \\d{3}\\.[A-Z]\\d?) on A-801 = the gold answer 38; they lie on one text line, i.e. the schedule is rotated 90 degrees, so columns must be rebuilt by x-alignment.",
+    "why_it_matters_for_stoa": "Deterministic table reconstruction from word boxes (cluster by x for rotated tables, by y otherwise; cell borders from the vector line segments) answers the count/area/text schedule questions exactly, and the cited cells can be highlighted. An LLM (Haiku/Sonnet) only needs to map the question to a column filter, on a few KB of structured rows instead of an image.",
+    "source_url": "https://pymupdf.readthedocs.io/en/latest/page.html#Page.find_tables",
+    "code_or_weights_available": "PyMuPDF; Camelot (MIT) lattice mode is another option for line-ruled tables.",
+    "year": "2026"
+   },
+   {
+    "title": "VecFormer: Point or Line? Using Line-based Representation for Panoptic Symbol Spotting in CAD Drawings (NeurIPS 2025)",
+    "what": "Transformer on a type-agnostic line-sampled representation of vector primitives, with Branch Fusion Refinement. FloorPlanCAD PQ 88.4 without layer prior (PQth 90.9, PQst 85.9) and 91.1 with layer prior; current published SOTA. Trained 500 epochs on 8x A100, batch 2/GPU. Params, training time and inference speed not reported. Uses ~15% fewer tokens than point-based input and ~8x shorter sequences than CADSpotting.",
+    "why_it_matters_for_stoa": "Best model if we needed learned symbol spotting on raw CAD vectors (opening_design DWG/PDF, unlayered DXF). For this dataset it is not needed: Swiss DXFs are already semantically layered and opening_design questions are schedules. Training from scratch on 8xA100 for 500 epochs does not fit 36 h, and no weights are released.",
+    "source_url": "https://github.com/WesKwong/VecFormer",
+    "code_or_weights_available": "Code Apache-2.0; no pretrained weights released. Paper https://arxiv.org/abs/2505.23395",
+    "year": "2025"
+   },
+   {
+    "title": "SymPoint: Symbol as Points (ICLR 2024)",
+    "what": "Treats each vector primitive as a point (point cloud), Point Transformer backbone + Mask2Former-style head. 35M params, 66 ms inference per drawing (raster baselines need ~1.2 s extra to rasterize). FloorPlanCAD PQ/RQ/SQ: 79.6/89.0/89.4 at 300 epochs, 81.9/90.4/90.6 at 500, 83.3/91.1/91.4 at 1000 epochs, on 8x A100. FloorPlanCAD has 35 classes (30 thing, 5 stuff).",
+    "why_it_matters_for_stoa": "Shows the cost of the learned route: long training (1000 epochs) for 83 PQ. Our rule-based layer reading beats this on Swiss data.",
+    "source_url": "https://arxiv.org/abs/2401.10556",
+    "code_or_weights_available": "Code: https://github.com/nicehuster/SymPoint",
+    "year": "2024"
+   },
+   {
+    "title": "SymPoint-V2 (SymPoint Revolutionized: Layer Feature Enhancement)",
+    "what": "Adds CAD layer features (LFE) and Position-Guided Training for faster convergence. FloorPlanCAD PQ 83.2 without prior, 90.1 with layer prior (PQth 90.8, PQst 80.8). CADSpotting notes it depends on 4 fixed primitive types and on layer info that is often missing in real drawings.",
+    "why_it_matters_for_stoa": "The only top model with downloadable weights (Google Drive). Could be tried zero-shot on opening_design floor-plan sheets exported to SVG, but domain (Chinese commercial CAD, FloorPlanCAD) differs from US residential/commercial sets; expect degraded accuracy (not measured).",
+    "source_url": "https://github.com/nicehuster/SymPointV2",
+    "code_or_weights_available": "Code public, no licence file shown; weights on Google Drive (link in README). Env: torch 1.10 + CUDA 11.1, custom pointops op. Paper https://arxiv.org/abs/2407.01928",
+    "year": "2024"
+   },
+   {
+    "title": "CADTransformer (CVPR 2022) and GAT-CADNet (CVPR 2022)",
+    "what": "CADTransformer: transformer over primitive tokens with HRNet-W48 image embedding; FloorPlanCAD PQ 68.9 (PQth 78.5, PQst 58.6); trains on a 24 GB GPU with max_prim=12000; no trained checkpoint released. GAT-CADNet: drawing as graph, symbol spotting as adjacency-matrix/subgraph prediction with relative spatial encoding; PQ 73.7, RQ 80.7, SQ 91.4; no official code (one third-party reproduction).",
+    "why_it_matters_for_stoa": "Graph-on-primitives ideas are useful as features (adjacency of door leaf + arc, ellipse + cistern rectangle) for a tiny rule or GNN classifier, but the full models are dominated by VecFormer and not worth training here.",
+    "source_url": "https://github.com/VITA-Group/CADTransformer",
+    "code_or_weights_available": "CADTransformer: MIT, no weights. GAT-CADNet: paper https://openaccess.thecvf.com/content/CVPR2022/html/Zheng_GAT-CADNet_Graph_Attention_Network_for_Panoptic_Symbol_Spotting_in_CAD_CVPR_2022_paper.html; unofficial code https://github.com/Liberation-happy/GAT-CADNet",
+    "year": "2022"
+   },
+   {
+    "title": "CADSpotting and ArchCAD-400K / DPSS",
+    "what": "CADSpotting (arXiv 2412.07377): point-based spotting for large drawings; FloorPlanCAD PQ 88.9 with prior. ArchCAD-400K (arXiv 2503.22346): 413,062 chunks from 5,538 standardized drawings with auto line-level labels from CAD attributes; DPSS baseline fuses primitive and image features: PQ 86.2 without / 89.5 with prior on FloorPlanCAD (numbers from the VecFormer table).",
+    "why_it_matters_for_stoa": "ArchCAD-400K proves the same trick we can use: labels come for free from existing CAD attributes (layers, blocks). Swiss DXF layers are such free labels.",
+    "source_url": "https://arxiv.org/abs/2503.22346",
+    "code_or_weights_available": "No code/dataset link on the arXiv abstract page; dataset licence not stated there.",
+    "year": "2024-2025"
+   },
+   {
+    "title": "2026 follow-ups: PolarSym, TextCAD, SALI-FP",
+    "what": "PolarSym (arXiv 2608.11793, Aug 2026): polar direction/distance attention; +1.73 PQ, +1.54 RQ, +4.31 mIoU over a reproduced SymPoint-V2; absolute numbers not on abstract. TextCAD (arXiv 2607.12678, Jul 2026): fuses annotation text with primitives (Type-Attribute Correlation Encoder); numbers not on abstract. SALI-FP (arXiv 2609.25615, Sep 2026): evidence-gated multimodal floor-plan parsing and vectorization to reviewable records; ran on 11,534 production plans, 752,510 polygon objects; accuracy not on abstract.",
+    "why_it_matters_for_stoa": "Trend confirms Stoa's thesis: text + geometry fusion and evidence-gated, reviewable output. SALI-FP's 'constrain revisions by image evidence' matches our verifier design. None has public code.",
+    "source_url": "https://arxiv.org/abs/2609.25615",
+    "code_or_weights_available": "No code links for any of the three.",
+    "year": "2026"
+   },
+   {
+    "title": "FloorPlanCAD dataset",
+    "what": "15,663 CAD drawings (Nov 2021 release) in SVG + PNG with per-primitive semantic and instance labels, 35 classes (doors, windows, sanitary fixtures, stairs, furniture, walls, etc.). Project shut down in 2022.",
+    "why_it_matters_for_stoa": "Only needed if training a vector spotter; licence is non-commercial.",
+    "source_url": "https://floorplancad.github.io/",
+    "code_or_weights_available": "Annotations CC BY-NC 4.0; drawings copyright not owned by authors; Google Drive downloads.",
+    "year": "2021"
+   },
+   {
+    "title": "CubiCasa5K SVG ground truth (cross-track: vector labels for the raster 76%)",
+    "what": "5,000 Finnish floor plans with dense polygon SVG annotations, 80+ object categories, train/val/test lists, pretrained multi-task model weights (Google Drive). The challenge's cubicasa5k drawings come from this dataset (CC BY-NC-SA 4.0).",
+    "why_it_matters_for_stoa": "Rendering SVG polygons gives exact boxes for windows, doors, WC, sinks, showers, bathtubs, saunas for a raster detector. Similarly the Swiss PNGs are rendered from the same geometry as the DXF, so DXF entities give pixel-exact detector labels for free (vector-to-raster label transfer). Overlap between public CubiCasa5K splits and challenge drawings must be handled honestly (hold-out) to avoid leakage claims.",
+    "source_url": "https://github.com/CubiCasa/CubiCasa5k",
+    "code_or_weights_available": "Code + weights public; dataset on Zenodo record 2613548.",
+    "year": "2019"
+   },
+   {
+    "title": "DWG to DXF: LibreDWG 0.13.4/0.14 vs ODA File Converter",
+    "what": "LibreDWG (GNU, GPL-3.0-or-later): manual v0.13.4 (17 Mar 2026) says it reads all DWG formats r1.2-r2018 'for 99%'; dwg2dxf writes DXF R13-R2018 (--as=rNNNN, --minimal); still labelled beta; AutoCAD fails to import some of its DXFs; Homebrew ships libredwg 0.14. ODA File Converter: free download but ODA FAQ says non-members may use it for non-commercial applications only; packaged as unfree; ezdxf has an odafc add-on that calls it.",
+    "why_it_matters_for_stoa": "opening_design has 20 DWGs and 1 DXF in preview (no preview questions point at DWG). Use LibreDWG dwg2dxf as the open path (hackathon is non-commercial, GPL is fine as a separate CLI), with ODA as a fallback for files LibreDWG mangles; ezdxf recover mode to read the result. Not tested on our DWGs yet.",
+    "source_url": "https://www.gnu.org/software/libredwg/manual/LibreDWG.html",
+    "code_or_weights_available": "LibreDWG GPL-3.0 (https://github.com/LibreDWG/libredwg). ODA: https://www.opendesign.com/faq/question/what-are-oda-viewer-and-oda-file-converter",
+    "year": "2026"
+   },
+   {
+    "title": "OCR with positions for room labels: PaddleOCR 3.7 (PP-OCRv6), docTR, Surya 2.5, Florence-2",
+    "what": "PaddleOCR 3.7.0 (Jun 2026, Apache-2.0): PP-OCRv6 tiny/small/medium = 1.5M/7.7M/34.5M params, 50 languages in one model; PP-OCRv5 multilingual recognizer ~2M params, 109 languages; per-character boxes since 3.2; CPU/ONNX/OpenVINO. docTR (Apache-2.0): DBNet/LinkNet/FAST detection + CRNN/PARSeq etc., word-level boxes in a Page-Block-Line-Word tree. Surya 2.5 (689M params): code Apache-2.0, weights modified OpenRAIL-M (free under $5M revenue); 90+ languages; block-level polygons only; 4.5 pages/s at 192 DPI on H100. Florence-2-large (0.77B, MIT): <OCR_WITH_REGION> returns quad boxes + text.",
+    "why_it_matters_for_stoa": "Not needed for Swiss or opening_design (text layers exist). Needed for raster CubiCasa (Finnish room codes KH, MH, WC, S, PH) and scanned sets: PaddleOCR PP-OCRv6 small on CPU is the cheapest word-box OCR; matching a label to a room = point-in-polygon of the OCR box centre against segmented room polygons.",
+    "source_url": "https://github.com/PaddlePaddle/PaddleOCR",
+    "code_or_weights_available": "PaddleOCR Apache-2.0; docTR https://github.com/mindee/doctr Apache-2.0; Surya https://github.com/datalab-to/surya; Florence-2 https://huggingface.co/microsoft/Florence-2-large MIT",
+    "year": "2024-2026"
+   }
+  ],
+  "concrete_recipe": "Answer to the key question: YES for Swiss Dwellings (measured), and YES for the opening_design questions that exist (they are schedule lookups on text-layer PDFs). No GPU and no LLM call are needed for the answer itself.\n\nPhase 1 (hours 0-5): Swiss DXF solver, CPU only.\n1. For a swiss_dwellings PDF, open the same-stem .dxf with ezdxf. Build rooms = closed LWPOLYLINE on ROOM_OUTLINE (shapely Polygon, buffer(0)). Assign ROOM_TEXT entities by point-in-polygon (use align_point when halign/valign are set). Each room gets name, number, printed area.\n2. Rules (preview score in brackets): room area = polygon.area in m2 [256/256]; also cross-check against the printed 'xx.xx m\u00b2' label and flag any disagreement > 0.5%. Doors = number of 5-vertex DOOR polylines [65/65]. Windows = WINDOW rectangles / 3; better, group 3 parallel rectangles per opening [65/65]. Bathtubs = 69-vertex FIXTURE polylines [56/56]. Apartments = number of 'App. X' / 'Wohnung' / 'Appartement' labels [65/65]. Rooms labelled X = labels inside polygons, case-insensitive [662/675, fix the misses]. Apartment net area = rooms whose representative point is inside the UNIT_OUTLINE that holds the 'App. X' label, minus outdoor labels [106/112]. Floor net area = numbered rooms minus outdoor, shaft and void labels in DE/FR/IT/EN [58/65; finish the label list].\n3. Still open: split 48-vertex ellipses into WC vs washbasin (sum is 65/65). Fit a 3-feature rule (major axis, minor axis, a 4-vertex cistern rectangle touching the ellipse) on the preview, then check it on held-out floors. Map showers the same way (likely a 4-vertex rectangle with 2-point diagonals).\n4. Question routing: regex templates in 4 languages (EN/DE/FR/IT) cover all 10 Swiss templates. Use Haiku only as fallback to map an unseen phrasing to a template (~300 tokens, ~$0.0003).\n5. Visual proof: render the PDF page, overlay the chosen polygons or entities in a color, list the vertices and the shoelace sum, and show the printed label beside the computed area. A human checks it in seconds.\nExpected: >=97% on Swiss questions now, ~99% after steps 3-4. Cost: $0, <100 ms per question.\n\nPhase 2 (hours 5-10): opening_design schedules.\n1. PyMuPDF words with boxes. Detect schedule tables by header tokens (DOOR SCHEDULE, ROOM FINISH SCHEDULE, WINDOW). Rebuild rows and columns by clustering word boxes along the reading axis; detect 90-degree rotation from word direction (dir field in get_text('dict')). Use vector line segments as cell borders where present.\n2. Emit a typed table (JSON) with a bbox per cell. Sonnet or Haiku writes a filter or aggregation over the JSON (not over the image); Python runs it; the UI highlights the counted cells. Preview check: 38 door ids on A-801 = gold 38.\n3. A-701 fixture counts (3 questions): count WATER CLOSET / LAVATORY tags or repeated vector block geometry inside the named enlarged-plan viewport (match identical path signatures by hashing the normalized path list). Cost ~$0.001-0.005 per question with Haiku or Sonnet on a small text payload.\n\nPhase 3 (hours 10-14): DWG and general vector PDFs.\n1. Install LibreDWG dwg2dxf (0.13.4/0.14, GPL-3.0) in a uv tool or a container, not in the shared machine config. Convert with dwg2dxf --as=r2018. Read with ezdxf.recover. Keep ODA File Converter as a manual fallback only (non-commercial use only).\n2. Generic room extraction for unlayered vector PDFs/DXFs: collect wall-like strokes (by line width or layer name), snap endpoints (1-2 cm tolerance), close door gaps by joining the door leaf chord, then shapely.polygonize. Assign room labels by point-in-polygon of text spans. Scale from the title block ('1:100') or a dimension string. Report the polygon on the page as proof.\n\nPhase 4, optional Verda job (hours 14-24), aimed at the raster 76%, not at vector data.\n1. Make free detector labels: Swiss PNGs are rendered from the same geometry as the DXF, so map DOOR/WINDOW/FIXTURE entities to PNG boxes (affine from the DXF extents to the PNG frame). Add CubiCasa5K SVG polygons (windows, doors, WC, sinks, showers, bathtubs, sauna stove) rasterized to boxes.\n2. Train an Apache-licensed detector (RT-DETRv2 or D-FINE; avoid AGPL Ultralytics if licence matters) on 1x A100 80 GB ($2.37/h) for 3-5 h, about $10. Hold out every challenge drawing from training to avoid leakage. Accuracy is not measured; set a target of >=90% exact counts on held-out CubiCasa floors before switching the raster path from Claude points to the detector.\n3. Do NOT train VecFormer/SymPoint: published runs use 8x A100 for 500-1000 epochs, and no question in the preview needs learned vector spotting.\n\nBudget: Swiss + opening_design answers at $0-0.005 per question. Total compute for this track: under $15 of Verda credit (optional Phase 4 only).",
+  "risks": [
+   "The full 10 GB set may have Swiss PDFs without a DXF sibling, or different layer names. Mitigation: a PDF-only route from text spans (printed 'xx.xx m\u00b2' labels) and styled vector paths at the stated 1:100 A3 scale. It is built on the same rules and still deterministic.",
+   "The rules were fit on 65 Swiss preview floors (e.g. 'windows = rectangles / 3', 'doors = 5-vertex polylines'). They can break on special openings: sliding doors, bay or corner windows, double doors drawn differently. Validate on a held-out slice of the full set before you trust 100%. Keep the printed label vs polygon area cross-check as a self-test.",
+   "WC vs washbasin split and shower mapping are not solved yet. Only their sum is exact (65/65).",
+   "Label lists for outdoor, shaft and void rooms in DE/FR/IT/EN decide the floor net area questions (58/65 now). A missed synonym silently changes the sum.",
+   "Exploiting a DXF sibling to answer a question that points at the PDF can look like 'reading the answer key'. Present it as a legitimate multi-format ingest: the README says that files with the same name are the same drawing in another format. Also show that the PDF-only route agrees.",
+   "opening_design schedules are rotated and not line-ruled for PyMuPDF find_tables (0 tables found). Column reconstruction from word boxes can misalign merged or multi-line cells (e.g. '5'-10 3/8\"'). Text answers are free-form, so the scoring is unclear.",
+   "LibreDWG is beta: it reads r1.2-r2018 'for 99%', and some of its DXFs fail in AutoCAD. Not yet tested on the 20 opening_design DWGs. ODA File Converter is non-commercial only for non-members. That is fine for the hackathon but not for a product.",
+   "Learned vector spotters (VecFormer, SymPoint-V2, CADSpotting) were trained on FloorPlanCAD (CC BY-NC, Chinese CAD conventions) on 8x A100 for 500-1000 epochs. Zero-shot transfer to US or Swiss drawings is unmeasured. SymPoint-V2 shows no licence file, and VecFormer has no released weights.",
+   "Licences: PyMuPDF is AGPL, Ultralytics YOLO is AGPL, Surya weights are restricted above $5M revenue, and CubiCasa5K is CC BY-NC-SA. Acceptable for a non-commercial hackathon demo, but name them if Stoa asks about productization.",
+   "CubiCasa5K public splits may contain the challenge drawings. If you train on them without holding out the challenge drawings, the result is contaminated."
+  ]
+ },
+ {
+  "track": "Low-cost, verifiable agentic architectures for drawing QA: routers and cascades, deterministic tool calling, verifiers vs self-consistency, abstention, caching and batch, distillation of tool traces, evidence UIs, and cost per question",
+  "key_findings": [
+   {
+    "title": "AECV-Bench: Benchmarking Multimodal Models on Architectural and Engineering Drawings Understanding",
+    "what": "Kondratenko et al., Jan 2026. Counting on 120 floor plans (doors, windows, bedrooms, toilets) plus 192 document QA pairs. Door and window counting by frontier multimodal models 'remains unsolved (often 0.40-0.55 accuracy)'. OCR and text QA reach up to 0.95. The authors recommend domain representations and tool workflows with a human in the loop.",
+    "why_it_matters_for_stoa": "This is the key result for our biggest gap. If Claude places points directly on raster plans, expect about 40-55% exact counts on doors and windows. Read text with OCR or a VLM (0.95). Count symbols with a trained detector. Use Claude only to adjudicate.",
+    "source_url": "https://arxiv.org/abs/2601.04819",
+    "code_or_weights_available": "No code or data link on the abstract page",
+    "year": "2026"
+   },
+   {
+    "title": "CubiCasa5K dataset and multi-task model",
+    "what": "5,000 Finnish floor plans with polygon SVG annotations in more than 80 categories. Split is 4200 train / 400 val / 400 test (per secondary sources). Icon classes include Window, Door, Closet, Toilet, Sink, Sauna Bench, Bathtub and Fireplace. A pretrained multi-task segmentation model (Raster-to-Vector derived, PyTorch) is in the repo. A later paper (2408.01526) reports the original baseline IoU as about 0.53 for doors and 0.66 for windows.",
+    "why_it_matters_for_stoa": "This is the source of the cubicasa5k questions (76% of the preview are counts). The SVG labels give free supervision to train a detector on Verda for the exact icons asked about (toilets, sinks, showers and baths, saunas, doors, windows). Check for overlap between the challenge images and the CubiCasa train split before you claim accuracy.",
+    "source_url": "https://github.com/CubiCasa/CubiCasa5k",
+    "code_or_weights_available": "Code and pretrained weights (Google Drive link in README). Licence CC BY-NC 4.0, so non-commercial only.",
+    "year": "2019"
+   },
+   {
+    "title": "cubicassa5k-coco (Hugging Face dataset)",
+    "what": "CubiCasa5K converted to COCO instance segmentation as Parquet: 4,228 train / 748 valid images, 270k polygons. Only 8 classes: wall, door, window, room, bathroom, kitchen, bed, stairs. Heavy class imbalance.",
+    "why_it_matters_for_stoa": "Gives a ready door and window detector or segmenter dataset without parsing SVG. It does NOT have toilet, sink, shower, bathtub or sauna, so parse the original SVG for those icon classes.",
+    "source_url": "https://huggingface.co/datasets/phungpx/cubicassa5k-coco",
+    "code_or_weights_available": "Dataset public. 'cubicasa5k-research-license', which inherits the upstream CC BY-NC terms.",
+    "year": "2025"
+   },
+   {
+    "title": "RF-DETR (Roboflow, ICLR 2026)",
+    "what": "Real-time DETR detector and segmenter. Detection Nano/Small/Medium/Large: 48.4/53.0/54.7/56.5 COCO AP at 2.3/3.5/4.4/6.8 ms on T4 (TensorRT FP16). Segmentation sizes 40.3-49.9 AP. About 30-34M params. A Roboflow Universe CubiCasa model (door, window, wall) reports mAP@50 74.6%.",
+    "why_it_matters_for_stoa": "An Apache-2.0 alternative to Ultralytics YOLO (AGPL-3.0). It fine-tunes on CubiCasa icons in a few GPU hours. Inference costs effectively $0 per drawing, and each detection is a box a human can check.",
+    "source_url": "https://github.com/roboflow/rf-detr",
+    "code_or_weights_available": "Code and weights. Apache 2.0 for N/S/M/L and all segmentation sizes. PML 1.0 for XL/2XL.",
+    "year": "2025-2026"
+   },
+   {
+    "title": "Grounding DINO zero-shot on CubiCasa (community repo heypaprika/gdino)",
+    "what": "Zero-shot mAP@0.5 is about 0.0 on 10 CubiCasa classes (400 test plans). The prompt '{class} symbol' raises toilet recall from 6% to 21% and sink from 6% to 19%. Thin linear symbols (doors, windows) stay at about 0%.",
+    "why_it_matters_for_stoa": "Open-vocabulary detectors and counters (Grounding DINO, CountGD) do not transfer to architectural symbols. A supervised detector trained on CubiCasa labels is required. Do not spend hackathon hours on zero-shot CV.",
+    "source_url": "https://github.com/heypaprika/gdino",
+    "code_or_weights_available": "Code public on GitHub. Licence not checked.",
+    "year": "2025"
+   },
+   {
+    "title": "Set-of-Mark Prompting (SoM)",
+    "what": "Yang et al. 2023 (Microsoft). Overlay numbered marks, masks or boxes from a segmenter on the image. The multimodal LLM then refers to marks by ID. Zero-shot GPT-4V with SoM beat fully fine-tuned referring-expression models on RefCOCOg.",
+    "why_it_matters_for_stoa": "This is the escalation pattern. The detector proposes numbered candidates. Claude only accepts or rejects mark IDs and may add missed points, so its output stays grounded and checkable, and it needs far fewer output tokens than free pointing. The same numbered marks are the evidence in the UI.",
+    "source_url": "https://arxiv.org/abs/2310.11441",
+    "code_or_weights_available": "Code at github.com/microsoft/SoM",
+    "year": "2023"
+   },
+   {
+    "title": "Getting to the Point: Pointing Improves LVLMs at Counting",
+    "what": "Alghisi et al., Mar 2026. Point-then-Count (point at each instance, then count the points) gives the highest accuracy among the methods they tested. Predicted points are correctly placed in more than 94% of cases (F1), and the method generalizes better out of distribution. The abstract gives no headline accuracy delta.",
+    "why_it_matters_for_stoa": "Supports our existing count = len(points) design as the right fallback for a VLM, and as the right evidence format. It is still worse than a trained detector on domain symbols (see AECV-Bench).",
+    "source_url": "https://arxiv.org/abs/2603.21746",
+    "code_or_weights_available": "No code link. Paper CC BY 4.0.",
+    "year": "2026"
+   },
+   {
+    "title": "RouteLLM: Learning to Route LLMs with Preference Data",
+    "what": "Ong et al. (LMSYS), ICLR 2025. Strong/weak routers (matrix factorization, BERT, causal LLM, similarity-weighted Elo) are trained on preference data. The README reports up to 85% cost reduction while keeping 95% of GPT-4 quality on MT-Bench, and more than 40% cheaper than commercial routers.",
+    "why_it_matters_for_stoa": "A learned router is overkill here. Our routing signal is mostly deterministic: file type, question template and tool confidence. Its useful lesson is to calibrate the threshold so a target fraction goes to the strong model.",
+    "source_url": "https://github.com/lm-sys/RouteLLM",
+    "code_or_weights_available": "Code and router weights on HF (routellm org). Apache-2.0.",
+    "year": "2024-2025"
+   },
+   {
+    "title": "FrugalGPT",
+    "what": "Chen, Zaharia, Zou 2023. An LLM cascade with a learned answer scorer. It matches GPT-4 with up to 98% cost reduction, or gives +4% accuracy at equal cost.",
+    "why_it_matters_for_stoa": "This is the canonical cheap-first cascade with a scorer. In our setting the scorer can be deterministic (detector confidence, agreement with OCR, geometry checks) instead of a learned model.",
+    "source_url": "https://arxiv.org/abs/2305.05176",
+    "code_or_weights_available": "Not stated on the abstract page",
+    "year": "2023"
+   },
+   {
+    "title": "A Unified Approach to Routing and Cascading for LLMs (cascade routing)",
+    "what": "Dekoninck, Baader, Vechev (ETH), 2024, revised Oct 2026. Proves optimal cascading and routing strategies and unifies them as 'cascade routing', which beats both. Main finding: the accuracy of the quality estimator is the key factor in whether model selection works.",
+    "why_it_matters_for_stoa": "Spend the engineering effort on the confidence signal (calibrated on the 7,990 preview questions), not on adding more models.",
+    "source_url": "https://arxiv.org/abs/2410.10347",
+    "code_or_weights_available": "Not stated on the abstract page",
+    "year": "2024-2026"
+   },
+   {
+    "title": "Is Escalation Worth It? On the Depth of LLM Cascades",
+    "what": "Bouchard, May/Oct 2026. Over an 8-model pool and 5 benchmarks, 2-model cascades add 2.1-8.2 points of mean accuracy over the best single model. Deeper cascades give no gain in 118 of 135 comparisons (at most +0.43 points). Depth helps only when the deferral score tracks the current model's own errors, not shared query difficulty.",
+    "why_it_matters_for_stoa": "Build exactly two tiers: cheap deterministic CV/tools, then Opus adjudication. A middle Sonnet or Haiku vision tier is unlikely to pay off.",
+    "source_url": "https://arxiv.org/abs/2605.06350",
+    "code_or_weights_available": "Not stated",
+    "year": "2026"
+   },
+   {
+    "title": "Cost-Saving LLM Cascades with Early Abstention",
+    "what": "Zellinger, Liu, Thomson 2025. Small and large models make correlated mistakes, so the cheap model may abstain early. Across 6 benchmarks: overall loss -2.2%, cost -13%, error -5%, abstention +4.1%.",
+    "why_it_matters_for_stoa": "Supports a 'needs review' outcome when the cheap tier is unsure and the question type is known to defeat Claude too (for example dense door counts). Show the uncertain marks instead of paying Opus to guess.",
+    "source_url": "https://arxiv.org/abs/2502.09054",
+    "code_or_weights_available": "Not stated",
+    "year": "2025"
+   },
+   {
+    "title": "Dynamic Model Routing and Cascading for Efficient LLM Inference: A Survey",
+    "what": "Moslem and Kelleher, TMLR 2026. Survey of routing by difficulty, preference, clustering, uncertainty, RL, multimodality and cascades. It describes a common 3-stage pipeline: pre-router, quality estimator, escalation policy.",
+    "why_it_matters_for_stoa": "Good citation for the pitch. Our design is an instance of this pipeline with a deterministic pre-router (file type and question template).",
+    "source_url": "https://arxiv.org/abs/2603.04445",
+    "code_or_weights_available": "N/A (survey)",
+    "year": "2026"
+   },
+   {
+    "title": "AutoMix: Automatically Mixing Language Models",
+    "what": "Aggarwal, Madaan et al., NeurIPS 2024. Few-shot self-verification by the small model plus a POMDP router to handle noisy verification. More than 50% compute cost reduction at comparable performance.",
+    "why_it_matters_for_stoa": "Self-verification is noisy. Prefer external, deterministic verification (point inside room polygon, OCR label agreement, area recompute) over asking the model whether it is sure.",
+    "source_url": "https://arxiv.org/abs/2310.12963",
+    "code_or_weights_available": "No repo linked on the abstract page. Paper CC BY 4.0.",
+    "year": "2023-2024"
+   },
+   {
+    "title": "Large Language Monkeys: Scaling Inference Compute with Repeated Sampling",
+    "what": "Brown et al. 2024. Coverage rises log-linearly with the number of samples. With an automatic verifier this becomes accuracy (SWE-bench Lite 15.9% to 56% at 250 samples). Without one, majority voting and reward models plateau after a few hundred samples.",
+    "why_it_matters_for_stoa": "Self-consistency (vote over N Claude samples) costs N times as much and plateaus. Correlated VLM counting errors make voting weak. Spend the budget on deterministic verifiers and on agreement between different signal types (detector vs OCR vs VLM).",
+    "source_url": "https://arxiv.org/abs/2407.21787",
+    "code_or_weights_available": "Not stated on the abstract page",
+    "year": "2024"
+   },
+   {
+    "title": "Mitigating LLM Hallucinations via Conformal Abstention",
+    "what": "Abbasi Yadkori et al. (DeepMind) 2024. Conformal prediction on self-consistency similarity scores decides when to abstain, with a theoretical bound on the error rate. Less conservative than log-prob baselines on long answers.",
+    "why_it_matters_for_stoa": "Use split-conformal calibration on the preview set to set the escalate and abstain thresholds for a stated target error, for example at most 5% wrong among answered counts. This also gives a clean slide for the accuracy criterion.",
+    "source_url": "https://arxiv.org/abs/2405.01563",
+    "code_or_weights_available": "Not stated",
+    "year": "2024"
+   },
+   {
+    "title": "Program of Thoughts Prompting",
+    "what": "Chen et al., TMLR 2023. The LLM writes code and an interpreter does the arithmetic. About +12% on average over chain-of-thought across math and financial QA. SOTA on math datasets with self-consistency.",
+    "why_it_matters_for_stoa": "Supports our design: area, volume and length always come from executed tools (IFC Qto, DXF polylines, shoelace on detected polygons), never from model arithmetic. The 2% tolerance makes model arithmetic a needless risk.",
+    "source_url": "https://arxiv.org/abs/2211.12588",
+    "code_or_weights_available": "Code at github.com/wenhuchen/Program-of-Thoughts",
+    "year": "2022-2023"
+   },
+   {
+    "title": "ViperGPT: Visual Inference via Python Execution",
+    "what": "Sur\u00eds, Menon, Vondrick 2023. An LLM writes Python that composes vision modules through an API. Interpretable, and needs no training.",
+    "why_it_matters_for_stoa": "Precedent for 'Claude writes a short program over our drawing API' (detections, OCR spans, room polygons). The executed program is itself an evidence trail.",
+    "source_url": "https://arxiv.org/abs/2303.08128",
+    "code_or_weights_available": "Project site viper.cs.columbia.edu. No repo on the abstract page.",
+    "year": "2023"
+   },
+   {
+    "title": "Visual Program Distillation (VPD)",
+    "what": "Hu et al., CVPR 2024 Oral. Sample several tool-calling programs from an LLM, execute them, keep a verified-correct one, turn it into a rationale and fine-tune a VLM (PaLI-X). SOTA claimed on TallyQA (counting), MMBench, OK-VQA and POPE, and the VLM answers in a single forward pass.",
+    "why_it_matters_for_stoa": "This is the recipe for distilling Opus tool traces. Keep only traces whose answer matches ground truth (rejection sampling), then SFT a small open model. Latency and cost drop to one forward pass.",
+    "source_url": "https://arxiv.org/abs/2312.03052",
+    "code_or_weights_available": "No official code linked. Paper CC BY 4.0.",
+    "year": "2023-2024"
+   },
+   {
+    "title": "Distilling LLM Agent into Small Models with Retrieval and Code Tools (Agent Distillation)",
+    "what": "Kang et al., NeurIPS 2025 Spotlight. Distills full ReAct/code-tool trajectories from a Qwen2.5-32B teacher (about 2k trajectories) into 0.5B/1.5B/3B students with TRL SFT. Students match CoT-distilled models one size up (0.5B ~ 1.5B, 3B ~ 7B). Adds 'first-thought prefix' and self-consistent action generation.",
+    "why_it_matters_for_stoa": "A small, fast distillation target for the hackathon: a 1.5B-3B text-only planner that maps a question in any of about 30 languages to a tool program, for example count(class='toilet', drawing=...). It runs on a V100 and gives a credible 'trained on Verda' story.",
+    "source_url": "https://github.com/Nardien/agent-distillation",
+    "code_or_weights_available": "Code Apache-2.0. Trajectory datasets released. Scripts assume 4 GPUs.",
+    "year": "2025"
+   },
+   {
+    "title": "Qwen2.5-VL-7B-Instruct and Qwen3-VL-8B-Instruct",
+    "what": "Open VLMs with box and point grounding and JSON output. Qwen2.5-VL-7B: DocVQA 95.7, ChartQA 87.3, max_pixels configurable (suggested 256-1280 x 28x28). Qwen3-VL-8B (late 2025): stronger 2D grounding, OCR in 32 languages. LoRA: 4-bit Unsloth fits about 7-15 GB, 51 min for a small OCR task, 4-12 h for about 10k images on a 24 GB GPU (blog numbers).",
+    "why_it_matters_for_stoa": "The local VLM option for a distilled answerer or the OCR of Finnish room labels. Not needed for the core count path if the detector and OCR work.",
+    "source_url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
+    "code_or_weights_available": "Weights Apache-2.0 (both 7B and Qwen3-VL-8B: https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)",
+    "year": "2025"
+   },
+   {
+    "title": "vLLM Qwen2.5-VL-7B throughput on A100",
+    "what": "RedHat/Neural Magic cards (vLLM 0.7.2, 1xA100): document VQA with 1680x2240 images peaks at 0.7 QPS (w8a8 0.8), visual reasoning 640x480 2.6 QPS, single-stream 2.8 s per document. vLLM issue #24728 (A100 40GB): about 13-21 req/s at concurrency 50 on small ShareGPT4V images.",
+    "why_it_matters_for_stoa": "Basis for the local cost estimate: about $0.001 per question on large plan images at $2.37/h, down to about $0.0001 with capped resolution. V100 numbers are not reported.",
+    "source_url": "https://huggingface.co/RedHatAI/Qwen2.5-VL-7B-Instruct-FP8-Dynamic",
+    "code_or_weights_available": "Benchmark issue: https://github.com/vllm-project/vllm/issues/24728",
+    "year": "2025"
+   },
+   {
+    "title": "Claude vision token cost, coordinates, caching and batch (official docs)",
+    "what": "Image tokens = ceil(w/28) x ceil(h/28). Claude 4.7+ high-res tier: long edge up to 2,576 px and at most 4,784 tokens. Docs: a 1000x1000 image is 1,296 tokens, about $5.18 per 1,000 images on Opus 5.5. Ask for absolute pixel coordinates (not 0-1000). Pre-resize so coordinates map 1:1. Crop for small targets. PDFs are rasterized server-side, so coordinates do not map back: rasterize yourself. Prices per MTok: Opus 5.5 $4 in / $20 out, cache read $0.20 (0.05x), 5-minute cache write $5. Sonnet 5.5 $2/$10. Haiku 5.5 $0.10/$0.50, cache read $0.01. Batch API -50% on input and output, stacks with caching. Minimum cacheable prefix 286 tokens.",
+    "why_it_matters_for_stoa": "A full-resolution plan costs about $0.019 of input on Opus 5.5 and about $0.0005 on Haiku 5.5. Put all questions for one drawing behind one cached image prefix, or answer them in one call, and run evaluation through Batch.",
+    "source_url": "https://platform.claude.com/docs/en/build-with-claude/vision-coordinates",
+    "code_or_weights_available": "Pricing: https://platform.claude.com/docs/en/about-claude/pricing ; Vision: https://platform.claude.com/docs/en/build-with-claude/vision",
+    "year": "2026"
+   },
+   {
+    "title": "Fostering Appropriate Reliance on LLMs: The Role of Explanations, Sources, and Inconsistencies (CHI 2025)",
+    "what": "Kim et al. Think-aloud study (n=16) plus a pre-registered experiment (N=308). Explanations increase reliance on both correct AND incorrect answers. Sources increase appropriate reliance and decrease overreliance on wrong answers. Visible inconsistencies reduce overreliance.",
+    "why_it_matters_for_stoa": "UI rule: lead with checkable evidence (marks on the drawing, IFC entity IDs, OCR spans), not prose rationale. When signals disagree (detector says 7, OCR labels say 6), show the disagreement. It helps the human catch errors.",
+    "source_url": "https://arxiv.org/abs/2502.08554",
+    "code_or_weights_available": "N/A (HCI study)",
+    "year": "2025"
+   },
+   {
+    "title": "Effects of LLM-based Search on Decision Making: Speed, Accuracy, and Overreliance (CHI 2025)",
+    "what": "Spatharioti, Rothschild, Goldstein, Hofman. LLM search halved time-on-task with similar accuracy when the model was right, but users overrelied when it was wrong. Study 2 color-coded claims by token-probability confidence (green high, red low). This improved decision accuracy and reduced overreliance. The extracted text suggests roughly 50% less overreliance, but this figure is not verified from clean text.",
+    "why_it_matters_for_stoa": "Color each mark and each answer by confidence (detector score, agreement). The reviewer then checks only the red marks, so verification takes seconds instead of a full recount.",
+    "source_url": "https://www.microsoft.com/en-us/research/publication/effects-of-llm-based-search-on-decision-making-speed-accuracy-and-overreliance/",
+    "code_or_weights_available": "N/A. Paper PDF CC BY-NC-SA.",
+    "year": "2025"
+   },
+   {
+    "title": "PaperTrail: claim-evidence interface (CHI 2026) and Citations and Trust in LLM Answers (AAAI 2025)",
+    "what": "PaperTrail (within-subjects study, 26 researchers) maps each claim to evidence and shows supported, unsupported and omitted claims. It lowered trust, but people still relied on the LLM to avoid cognitive load. Ding et al.: any citation, even a random one, raises self-reported trust, and trust drops when users actually check.",
+    "why_it_matters_for_stoa": "Evidence must be cheap to check and verified by machine before display. Every mark and quote passes the deterministic verifier, and a 'verified by tool' badge separates computed answers from model judgements. Make checking a one-glance task (numbered marks, click to toggle) or people will not do it.",
+    "source_url": "https://arxiv.org/abs/2602.21045",
+    "code_or_weights_available": "N/A. Citations paper: https://arxiv.org/abs/2501.01303",
+    "year": "2025-2026"
+   },
+   {
+    "title": "When Should a Network Emit Geometry, and When Should It Detect It? (floorplan vectorization)",
+    "what": "He Zhang, Aug 2026. On CubiCasa5K, detection (heatmaps to graph) beats autoregressive emission on walls (+2.7 / +5.1 F1). Deterministic fusion of both raises wall F1 by 7 points. Releases corrected CubiCasa annotations, the ResPlan-FP benchmark (16,998 plans, CC BY 4.0) and an 'edit-cost' metric (how much human correction a draft needs).",
+    "why_it_matters_for_stoa": "Supports 'detect, do not generate' for symbols on scans, and a deterministic fusion of signals. Edit-cost is a strong framing for the verifiability criterion: count the clicks a human needs to fix our answer. The corrected labels may improve training.",
+    "source_url": "https://arxiv.org/abs/2608.25608",
+    "code_or_weights_available": "Code, benchmark and corrected labels at github.com/Cyprinus12138/fpvec-lab. Paper CC BY 4.0.",
+    "year": "2026"
+   },
+   {
+    "title": "PaddleOCR (PP-OCRv5/v6)",
+    "what": "Apache-2.0 OCR toolkit, v3.7.0 (Jun 2026). PP-OCRv6 tiny/small/medium is 1.5M/7.7M/34.5M params and covers 46 Latin-script languages. 0.13 s on A100. PP-OCRv5 multilingual covers 109 languages.",
+    "why_it_matters_for_stoa": "Many cubicasa questions are really text-label counts: bedrooms = 'MH' labels, bathrooms = KH/PH/PESUH/SH, WC, SAUNA/S, KEITTI\u00d6/K. OCR with boxes answers them deterministically and gives a box for each counted label as evidence. Finnish support is likely through Latin script but not confirmed.",
+    "source_url": "https://github.com/PaddlePaddle/PaddleOCR",
+    "code_or_weights_available": "Code and weights Apache-2.0",
+    "year": "2026"
+   }
+  ],
+  "concrete_recipe": "GOAL: route about 85-90% of questions to $0 deterministic tools with machine-checked evidence. Escalate the rest to Opus 5.5 as an adjudicator over numbered candidate marks, not as a free counter. Abstain with marked uncertainty when the signals still disagree. All per-question costs below are estimates from official prices and published throughput. Accuracy numbers are targets to measure, not results.\n\nSTEP 0 (hours 0-2): baseline harness. Score the 7,990 preview questions per (dataset, question template) with the official rules: exact for counts, 2% for area, length and volume. Add two baselines that cost nothing: (a) the mode answer per template, which is probably high for floors, saunas and kitchens; (b) the current Claude point-placing loop on about 300 sampled questions through the Batch API (about $5-15). This gives the real gap per template. Check whether the preview cubicasa images are in the CubiCasa5K train/val/test lists (match by image hash). Never look up their SVG at inference time.\n\nSTEP 1 (hours 1-4): deterministic router and question parser. Route by file type first: IFC goes to ifcopenshell/Qto, DXF to blocks, layers and polylines, vector PDF to text spans plus vector paths, PNG/JPG to the raster pipeline. Parse questions with regex for the EN/FI template pairs (they are templated). Fall back to Haiku 5.5 with structured output and a cached system prompt (about 3k tokens) that maps any of about 30 languages to {source, op: count|area|volume|length|lookup, class, filters, storey, unit}. Cost about $0.0002-0.0004 per question. Optional Verda bonus: distill this parser into Qwen2.5-1.5B-Instruct. Use about 5-10k Haiku-labelled questions from the full set, keep only parses whose tool result matches ground truth, and train with TRL SFT on 1xA100 for about 1 h (about $3), following the Agent Distillation and VPD pattern.\n\nSTEP 2 (hours 2-14, on Verda): raster CV inventory for CubiCasa-style plans.\n(a) Build labels. Parse the CubiCasa5K SVGs (train split only; hold out val) into COCO boxes and masks for: door, window, toilet, sink, shower, bathtub, sauna bench, plus room polygons with room type. Start from the HF cubicassa5k-coco set for door and window.\n(b) Train RF-DETR-Seg Medium or Large (Apache-2.0) at 1024-1280 px on 1xA100 80GB ($2.37/h). Plan 3-6 h, about $7-15 with margin. Training time is not reported for this dataset, so set --hours 8 and watch validation mAP. Fallback: the pretrained CubiCasa multi-task model from the repo, which gives icon and room segmentation and needs no training.\n(c) Run PaddleOCR (PP-OCRv6 small) on every plan. Count room-type labels (MH, KH/PH/PESUH/SH, WC, S/SAUNA, K/KEITTI\u00d6/KT) and assign each label to a room polygon.\n(d) Precompute one inventory JSON per drawing: detections with score, box and mask; OCR spans; rooms; storeys (count the separate plan regions or floor-name labels). This is computed once per drawing and serves about 20 questions. GPU cost about $0.000005 per drawing on V100, effectively $0 per question.\n\nSTEP 3 (hours 10-18): confidence and the cascade (two tiers only).\nAnswer = lookup in the inventory. Confidence features per question: number of detections in the uncertain score band (for example 0.3-0.6), agreement between independent signals (fixture detections vs OCR room labels: toilets vs WC/KH rooms, bedrooms by OCR vs room-type segmentation), and template difficulty.\nCalibrate with split conformal or a simple threshold search on half the preview set for a target error rate on accepted answers (for example 5%). Report coverage and accuracy on the other half.\nEscalate to Opus 5.5 with Set-of-Mark: one image pre-resized to at most 2576 px long edge (at most 4,784 tokens), candidates drawn as numbered boxes, crops of the uncertain marks. Ask for structured output {accept:[ids], reject:[ids], add:[[x,y]...], answer}. Pixel coordinates must map 1:1. The deterministic verifier checks that added points land on ink and inside the plan, that the count equals accepted + added, and that every accepted ID exists.\nCost per escalation, about 10k input / 800 output tokens: about $0.056 standard, about $0.03 with Batch. Put the system prompt and the drawing image first with cache_control so that later questions on the same drawing read the image at $0.20/MTok.\nIf the verifier fails, or Opus disagrees with both CV signals, return 'needs review' with the disputed marks in red (abstention).\n\nSTEP 4 (in parallel, hours 4-20): vector and BIM paths are already tool-based. Add a polygon-area tool (shoelace on DXF, IFC or detected room polygons, with the scale from a DXF unit or a scale-bar OCR) so that all area, volume and length answers come from executed code (PoT). Swiss Dwellings: use the DXF/PDF geometry for room-type counts and areas at $0. Use Claude only for free-text ifc_bench and opening_design schedule lookups, via the existing span-citing loop, with Sonnet 5.5 or Opus at low effort.\n\nSTEP 5 (hours 14-30): evidence UI. For every answer show: (1) the drawing with numbered marks or highlighted polygons, colored by confidence (green tool-verified, amber model-accepted, red disputed); (2) a side list 'counted 7 = marks 1-7', where clicking a mark toggles it and recomputes the answer live (edit-cost); (3) the provenance chain as chips: router decision, tool call, tool output, verifier checks passed, cost in $ and tokens for this answer, tier used; (4) for areas: the polygon, its vertex list, the formula and the scale source; (5) disagreements between signals shown explicitly. Lead with evidence, not prose explanations (CHI 2025 findings).\n\nSTEP 6 (hours 28-34): final evaluation on the full preview, run through the Batch API for the escalated part. Report per-template accuracy, coverage, escalation rate and dollars per 1,000 questions. Show the cost and accuracy frontier against the 'Opus does everything' baseline.\n\nCOST PER QUESTION (estimates; full-res plan about 4.8k image tokens, about 3k system/tool tokens):\n- Claude Opus 5.5 agentic loop with images, 3 turns (about 31k input / 3.3k output cumulative): about $0.19 uncached, about $0.10-0.12 with prompt caching, about $0.05-0.06 with Batch plus caching.\n- Opus 5.5 single shot (image + question, about 8k in / 600 out): about $0.044, $0.022 with Batch.\n- One Opus call that answers all ~20 questions of a drawing at once: about $0.15 per drawing, about $0.008 per question.\n- Haiku 5.5 single shot: about $0.0011, $0.0006 with Batch. Haiku 3-turn loop: about $0.005.\n- Local Qwen2.5-VL-7B (vLLM) on 1xA100 at $2.37/h: about $0.0009 per question at the published 0.7 QPS for 1680x2240 document images, about $0.0002 at 3 QPS with max_pixels capped near 1 MP. On 1xV100 at $0.24/h the throughput is not reported; with fp16 only and no FlashAttention-2, a guess of 3-5x slower gives about $0.0003-0.0005. Idle VM time dominates at hackathon scale.\n- Pure CV + OCR + rules: about $0.000005 per drawing on GPU (CPU also works), effectively $0 per question once amortized over about 20 questions per drawing.\n- Blended cascade, assuming 10-15% escalation: about $0.004-0.008 per question, about $0.002-0.004 with Batch. That is about 25-50x cheaper than Opus per question.\n\nEXPECTED ACCURACY: not reported for this exact setup, so measure it. Reference points: frontier VLMs score about 0.40-0.55 exact on door and window counts (AECV-Bench). OCR and text tasks reach up to 0.95. The CubiCasa baseline segmentation IoU is about 0.53 for doors and 0.66 for windows. DoorDet reports about 7.8 doors per plan, so an exact door count needs almost every instance right. Realistic targets: OCR-label templates (bedrooms, bathrooms, WC, saunas, kitchens) and fixtures (toilets, sinks) at 80-90%+; doors and windows at 60-75% after adjudication; IFC/DXF quantities at more than 90% where the tool resolves the right entity.\n\nVERDA USE: RF-DETR training on 1xA100 (about $10-20), optional parser distillation on 1xA100 (about $3), batch OCR and detection inventory on 1xV100 ($0.24/h). Total well under $50.",
+  "risks": [
+   "Train/test leakage: the CubiCasa5K SVG labels are public. If preview or hidden drawings are CubiCasa images, a detector trained on all 5,000 plans inflates accuracy, and reading their SVG at inference would be cheating. Hash-match the challenge images against the splits, train only on images not in the evaluation set, and say this openly to the judges.",
+   "Label semantics do not match: CubiCasa 'Door' polygons may not equal 'doors with a leaf'. Garage openings, French doors and glazed openings are handled differently (AECV-Bench counting rules). Shower vs bathtub, and 'separate WC room' vs a WC fixture, need rules tuned on preview answers.",
+   "Licences: CubiCasa5K is CC BY-NC 4.0 (fine for the hackathon, not for Stoa production use without permission). Ultralytics YOLO is AGPL-3.0, so prefer RF-DETR N/S/M/L (Apache-2.0). Qwen2.5-VL-7B and Qwen3-VL-8B are Apache-2.0. RF-DETR XL/2XL are PML 1.0.",
+   "Detector training time and resolution: floor-plan symbols are small and thin. At 512-576 px, doors and windows may vanish, while 1024+ px needs more VRAM and time. Budget a fallback to the pretrained CubiCasa multi-task model if RF-DETR is not converged by about hour 14.",
+   "Calibration overfitting: thresholds tuned on 320 preview drawings (about 4k cubicasa questions, highly correlated within a drawing) can overstate coverage. Split by drawing, not by question, when you calibrate and report.",
+   "Escalation may not help: correlated errors (Zellinger 2025; Bouchard 2026) mean Opus may fail on the same dense door clusters that fool the detector. Measure Opus adjudication accuracy on escalated cases. If it adds little, abstain instead of paying.",
+   "Coordinate mismatch: Claude coordinates refer to the resized image, and PDFs are rasterized server-side. Always rasterize yourself, pre-resize to the high-res tier limits, and set transformations.oversized_image='error' so marks cannot drift silently.",
+   "Opus 5.5 API changes: forced tool_choice returns a 400, thinking cannot be disabled, and the default effort is medium. Use tool_choice auto with strict tools or structured outputs, and set effort explicitly (low for adjudication). Caches are model-scoped, so a cascade loses cache reuse across models.",
+   "Haiku 5.5 is so cheap (about $0.001 per question) that a local 7B VLM gives almost no cost advantage for a demo. Justify Verda training by accuracy (a domain detector) and offline or privacy use, not by inference cost alone.",
+   "OCR on Finnish abbreviations: short labels (S, K, MH) collide with dimension text and other annotations. Restrict OCR label matching to text inside room polygons and to a whitelist, and show each counted label box so errors are visible.",
+   "Scope over 36 hours: CV training, calibration, the UI and the IFC/DXF paths at once is tight. If time runs out, cut parser distillation first, then conformal calibration (use a simple threshold), never the evidence UI."
+  ]
+ },
+ {
+  "track": "Multilingual question-to-structured-query parsing (semantic parsing to a DSL), at low cost",
+  "key_findings": [
+   {
+    "title": "Local measurement: the preview question set is a closed template set, and 95.0% of questions on unseen drawings match a template seen elsewhere",
+    "what": "I analysed questions.jsonl (7,990 questions). I replaced quoted strings with <Q> and numbers with <N>, which gives 465 distinct question signatures. cubicasa5k has only 24 signatures (12 intents x EN/FI). swiss_dwellings has about 73 (EN/DE/FR/IT) and ifc_models about 65 (EN/ET/DA/DE). A 5-fold split by drawing measured how many held-out questions have a signature seen in the training drawings: cubicasa5k 100%, swiss_dwellings 99.4%, ifc_models 92.0%, ifc_bench 3.2%, opening_design 0%, all 95.0%. The slots are verbatim strings from the drawing, in the drawing's language: an Italian drawing gets 'Stanza' in both the EN question and the IT question. They are not translated. 1,395 of 2,335 (path, answer) groups are exact EN plus local-language pairs. Median question length is 69 characters.",
+    "why_it_matters_for_stoa": "For about 95% of questions, a parser does not need ML. Slot extraction plus an exact template lookup costs $0 and is deterministic. Only the free-form families (ifc_bench, opening_design, about 4% of the preview) and unseen templates or languages in the hidden 120k set need a learned model or an LLM. The EN/local pairing lets us label every local-language template automatically from about 45 hand-labelled EN templates.",
+    "source_url": "file://./stoa-drawings/data/stoa-sample/preview/junction-dataset-preview/questions.jsonl",
+    "year": "2026",
+    "code_or_weights_available": "Analysis script was run inline. It is not saved."
+   },
+   {
+    "title": "When Do LLMs Replace Fine-Tuned NLU? A Decision Framework for Intent Detection in Production Conversational Systems (Rodrigues, Vas)",
+    "what": "The paper compares fine-tuned RoBERTa with Claude Haiku zero-shot. ATIS accuracy: RoBERTa 95.9 vs Haiku 84.1 (p<0.001). CLINC150: 89.1 vs 88.5 (statistical tie). The LLM wins on out-of-scope recall (85.6 vs 58.1), on ASR noise at 0 dB (92.5 vs 80.0) and on new intents without retraining (~94% vs 0%). The fine-tuned encoder is about three orders of magnitude cheaper and faster. Rule from the paper: with abundant labels and a stable intent set, use the encoder. When out-of-scope detection matters or the schema changes, use a schema-prompted LLM.",
+    "why_it_matters_for_stoa": "This supports a cascade. A trained encoder or a lookup handles the stable template intents. A Haiku fallback handles the out-of-scope and unseen questions, where the encoder is weak.",
+    "source_url": "https://arxiv.org/abs/2608.20371",
+    "year": "2026",
+    "code_or_weights_available": "No code link on the arXiv page. Paper is a 6-page preprint."
+   },
+   {
+    "title": "MASSIVE: A 1M-Example Multilingual NLU Dataset with 51 Typologically-Diverse Languages (FitzGerald et al.)",
+    "what": "Parallel intent plus slot dataset: 1M utterances, 51 languages, 60 intents, 55 slots. Full-training exact-match (intent and all slots correct), as reported in a follow-up table: mT5 text-to-text 66.6 average (73.4 high, 58.3 low locale), mT5 encoder 65.9, XLM-R 63.7. Zero-shot cross-lingual exact match is 25-37 points worse than full-data training. A follow-up raised exact match from 68.3 to 78.5 with machine-translated and synthetic data.",
+    "why_it_matters_for_stoa": "Do not depend on zero-shot cross-lingual transfer for the ~30 languages. Generate training pairs in each target language: translate the templates with Haiku, then fill the slots. Our template language is much narrower than MASSIVE's open utterances, so exact match should be much higher. That is an expectation, not a measurement.",
+    "source_url": "https://arxiv.org/abs/2204.08582",
+    "year": "2022 (ACL 2023)",
+    "code_or_weights_available": "Dataset public (CC BY 4.0, Amazon). Baseline code public."
+   },
+   {
+    "title": "SetFit: Efficient Few-Shot Learning Without Prompts (Tunstall, Reimers et al.)",
+    "what": "SetFit fine-tunes a Sentence Transformer contrastively on a few labelled pairs, then trains a classification head on top. Its accuracy is comparable to PEFT/PET few-shot methods, and it trains an order of magnitude faster. The backbones tested range from 15M to 355M parameters. The authors state that it works multilingually when you switch the ST body, for example to a multilingual XLM-R ST.",
+    "why_it_matters_for_stoa": "Best fit for the tier-2 intent classifier: about 45 intents, a few hundred exemplars per intent from templates and translations, minutes of training on one V100. It is also a cheap and honest 'trained on Verda' component.",
+    "source_url": "https://arxiv.org/abs/2209.11055",
+    "year": "2022",
+    "code_or_weights_available": "Code public: https://github.com/huggingface/setfit"
+   },
+   {
+    "title": "intfloat/multilingual-e5-small",
+    "what": "Multilingual embedding model: 12 layers, 384-dim, about 118M parameters, of which about 21.6M are non-embedding. Covers 100 languages (the XLM-R vocabulary), 512-token input. Inputs need the prefix 'query: '. The ONNX int8 version is about 113 MB.",
+    "why_it_matters_for_stoa": "Good backbone for SetFit or kNN intent classification on CPU, at well under 10 ms per question. It covers all EU languages in the dataset, Estonian and Finnish included.",
+    "source_url": "https://huggingface.co/intfloat/multilingual-e5-small",
+    "year": "2023",
+    "code_or_weights_available": "Weights public, MIT licence"
+   },
+   {
+    "title": "minishlab/potion-multilingual-128M (Model2Vec static embeddings)",
+    "what": "Static embeddings distilled from BAAI/bge-m3 and trained with Tokenlearn on C4 text in 101 languages. 256-dim. The card reports 90.86% of LaBSE's MTEB mean score (47.31 vs 52.07) and calls it 'orders of magnitude faster' on CPU. No absolute throughput figure is given. Released 23 May 2025.",
+    "why_it_matters_for_stoa": "Cheapest possible learned tier: a logistic-regression or kNN head on these embeddings trains in seconds on a laptop and runs in microseconds per question. Use it if the SetFit encoder is too heavy. It is less accurate than a contextual encoder.",
+    "source_url": "https://huggingface.co/minishlab/potion-multilingual-128M",
+    "year": "2025",
+    "code_or_weights_available": "Weights public, MIT. Library: https://github.com/MinishLab/model2vec"
+   },
+   {
+    "title": "XGrammar: Flexible and Efficient Structured Generation Engine for LLMs (Dong et al.)",
+    "what": "Grammar-constrained decoding with byte-level pushdown automata and context-independent token-mask caching. It is up to 100x faster than earlier engines, with near-zero end-to-end overhead and up to 80x end-to-end serving speedup on H100 with Llama-3.1. It is the default structured-output backend in vLLM, SGLang and TensorRT-LLM, and it supports JSON, regex and custom CFG.",
+    "why_it_matters_for_stoa": "If we run a local fine-tuned small LLM (Qwen3-0.6B) as the text-to-DSL fallback, serve it with vLLM plus XGrammar. A JSON schema with an intent enum then makes every output parseable, at no measurable cost.",
+    "source_url": "https://arxiv.org/abs/2411.15100",
+    "year": "2024 (v3 May 2025)",
+    "code_or_weights_available": "Code public: https://github.com/mlc-ai/xgrammar, Apache-2.0"
+   },
+   {
+    "title": "Outlines (dottxt-ai)",
+    "what": "Constrained generation library with regex, JSON schema / Pydantic, CFG and choice (Literal/Enum) outputs. Backends: transformers, llama.cpp, vLLM, Ollama, plus OpenAI/Gemini APIs.",
+    "why_it_matters_for_stoa": "The simplest way to constrain a local Qwen3-0.6B run in plain transformers on a V100, without setting up vLLM. Choice constraints over the intent enum turn the LM into a classifier.",
+    "source_url": "https://github.com/dottxt-ai/outlines",
+    "year": "2023-2026",
+    "code_or_weights_available": "Code public, Apache-2.0"
+   },
+   {
+    "title": "Constrained Decoding Eliminates Structural Failures in Small LLMs but Reveals a Scale-Dependent Semantic Gap (Chavan)",
+    "what": "Five open models from 0.6B to 4B, 14 structured-output tasks, three conditions: native, Outlines, XGrammar. Schema validity rose from 78.6-92.9% native to 100% constrained. Semantic errors, such as multi-step function calling, stay and get worse at smaller scale. The abstract gives no semantic accuracy numbers.",
+    "why_it_matters_for_stoa": "Constrained decoding guarantees valid DSL, not the correct intent. A 0.6B generator still needs fine-tuning on our templates, and its accuracy must be measured on held-out drawings and languages. This is a reason to prefer a classifier plus deterministic slot extraction over free generation.",
+    "source_url": "https://arxiv.org/abs/2609.23742",
+    "year": "2026",
+    "code_or_weights_available": "Code: https://github.com/CruiseDevice/small-llm-structured-benchmark (tag v1.0). Licence not stated on the arXiv page."
+   },
+   {
+    "title": "SLM-SQL: An Exploration of Small Language Models for Text-to-SQL (Sheng, Xu)",
+    "what": "Qwen2.5-Coder 0.5B-1.5B models, trained with SFT on SynSQL-derived data and then RL, plus corrective self-consistency. BIRD dev execution accuracy: 0.5B 56.87%, 1.5B 67.08%, an average gain of 31.4 points over base. The arXiv page does not report training compute.",
+    "why_it_matters_for_stoa": "Open-domain SQL is far harder than our closed DSL of about 45 intents with verbatim slots, and even there sub-2B models are usable after SFT. A fine-tuned Qwen3-0.6B on our template DSL should do much better, but no paper reports numbers for a task like ours.",
+    "source_url": "https://arxiv.org/abs/2507.22478",
+    "year": "2025",
+    "code_or_weights_available": "Authors announce release at https://github.com/CycloneBoy/slm_sql. Licence not stated on the arXiv page."
+   },
+   {
+    "title": "Qwen3-0.6B",
+    "what": "Causal LM with 0.6B parameters (0.44B non-embedding), 28 layers, GQA 16/8, 32K context, tied embeddings. Multilingual. Part of the Qwen3 open-weight release.",
+    "why_it_matters_for_stoa": "Candidate for an optional local text-to-DSL fallback that replaces Haiku. A LoRA or full fine-tune on about 15k synthetic pairs fits easily on one V100 16GB or A100. Training time on our data is not reported anywhere and has to be measured.",
+    "source_url": "https://huggingface.co/Qwen/Qwen3-0.6B",
+    "year": "2025",
+    "code_or_weights_available": "Weights public, Apache-2.0"
+   },
+   {
+    "title": "ByT5: Towards a token-free future with pre-trained byte-to-byte models (Xue et al.)",
+    "what": "Byte-level T5 models. The authors report that byte-level models are competitive with token-level ones and significantly more robust to noise and spelling variation.",
+    "why_it_matters_for_stoa": "Only relevant if slot strings come from OCR with noise, for example matching 'PESUH' or 'KPH' read from CubiCasa rasters. For clean typed questions, an encoder classifier with regex slots is cheaper. Treat it as a fallback idea, not the main design.",
+    "source_url": "https://arxiv.org/abs/2105.13626",
+    "year": "2021 (TACL 2022)",
+    "code_or_weights_available": "Code and weights released by Google (google-research/byt5). Apache-2.0 per the repo."
+   },
+   {
+    "title": "IFC-Bench v2 dataset (Hellin et al.)",
+    "what": "1,026 free-text QA pairs over 51 IFC models in 22 projects. Categories: direct retrieval 152, computational aggregation 569, geometric/spatial 112, incomplete information 194. Fixed test split of 514. Ground truths are free text from about 25 to 5.9k characters, in mixed units (m, sq m, sq ft, cu m, $). The dataset card reports no baseline accuracy.",
+    "why_it_matters_for_stoa": "This is where the dataset's ifc_bench family comes from. The answers are free-form, not templated: only 3.2% of the preview's ifc_bench questions matched a held-out template. Route these to the IFC agent, not to the DSL parser. The public train split (512) is usable for few-shot examples.",
+    "source_url": "https://huggingface.co/datasets/sylvainHellin/ifc-bench",
+    "year": "2025-2026",
+    "code_or_weights_available": "QA under CC BY 4.0. IFC models have their own licences: most CC BY/MIT, four GPLv3."
+   },
+   {
+    "title": "BIM Information Extraction Through LLM-based Adaptive Exploration (Hellin, Jang, Fuchs, Nousias, Borrmann)",
+    "what": "An LLM agent that runs code on the IFC model and discovers its structure as it goes ('adaptive exploration'). It significantly outperforms static NL-to-query generation in every configuration of a factorial ablation (2 LLM capability levels x 4 augmentation strategies) on ifc-bench v2. The abstract gives no accuracy numbers or model names.",
+    "why_it_matters_for_stoa": "Supports a hybrid design. Use a fixed DSL for the templated 95%, and do not force the heterogeneous IFC free-text questions into a static query language. The Drawing Desk IFC tool loop is the right home for those.",
+    "source_url": "https://arxiv.org/abs/2605.01698",
+    "year": "2026",
+    "code_or_weights_available": "Benchmark open (see IFC-Bench). Paper CC BY 4.0. Agent code link not on the abstract page."
+   },
+   {
+    "title": "Finnish room abbreviations (rakentaja.fi drawing legend)",
+    "what": "Standard list: TK tuulikaappi (vestibule), ET eteinen, K keitti\u00f6, KK keittokomero, RT/RH/R ruokailutila, AH asuinhuone, MH makuuhuone, OH olohuone, KH/KPH kylpyhuone, WC, SH suihkuhuone, S sauna, L\u00d6/L l\u00f6ylyhuone, PE/PH pesuhuone, PU/PKH pukuhuone, KHH kodinhoitohuone, APK apukeitti\u00f6, VH vaatehuone, KUI kuivaushuone, ASK askartelutila, VAR varasto, AT/AK autotalli/-katos, TEKN tekninen tila. Conflicts: in the fixture legend, TK also means tankokaappi (wardrobe), L means liesi (stove) and APK means astianpesukone (dishwasher). In housing ads, 'tk' means tupakeitti\u00f6 (kitchen). Other sources add PARV parveke, TH ty\u00f6huone, ALK alkovi, MT makuutila, and PESUH as a long form of pesuhuone.",
+    "why_it_matters_for_stoa": "The CubiCasa intents depend on this lexicon. 'Bathrooms' means KH, KPH, PH, PESUH, SH and excludes WC. 'Kitchens' includes K, KK, avokeitti\u00f6, tupakeitti\u00f6 and APK. 'Bedrooms' means MH. 'Saunas' means S or L\u00d6. Each DSL intent should carry a label regex for matching against OCR text, and the UI should show that regex. TK is a trap: in a floor-plan room label it means vestibule, not kitchen.",
+    "source_url": "https://www.rakentaja.fi/artikkelit/11940/rakennuspiirustukset.htm",
+    "year": "undated web page, fetched 2026-11-13",
+    "code_or_weights_available": "n/a (reference list)"
+   },
+   {
+    "title": "CubiCasa5K: A Dataset and an Improved Multi-Task Model for Floorplan Image Analysis (Kalervo et al.)",
+    "what": "5,000 Finnish floor plans with polygon (SVG) annotations in 80+ categories: 68,877 room instances and 136,676 icon instances. The experiments use 12 room classes (Background, Outdoor, Wall, Kitchen, Living Room, Bedroom, Bath, Hallway, Railing, Storage, Garage, Other) and 11 icon classes. The icon list is reported as Empty, Window, Door, Closet, Electrical Appliance, Toilet, Sink, Sauna Bench, Fire Place, Bathtub, Chimney. I could not check that list fully against the paper. Licence on Zenodo: CC BY-NC-SA 4.0.",
+    "why_it_matters_for_stoa": "The DSL target classes for raster counting should map one-to-one onto the CubiCasa annotation classes, so the parser's output feeds the detector or segmenter directly. For example, wc_seat maps to Toilet, sink to Sink, sauna to Sauna Bench or the room label S, window to Window, and door to Door. The 'showers and bathtubs' intent needs a check: I did not confirm a separate shower icon class among the 11.",
+    "source_url": "https://arxiv.org/abs/1904.01920",
+    "year": "2019",
+    "code_or_weights_available": "Code and weights: https://github.com/CubiCasa/CubiCasa5k. Data: https://zenodo.org/record/2613548 (CC BY-NC-SA 4.0)."
+   },
+   {
+    "title": "Swiss Dwellings dataset (Standfest et al., Archilyse)",
+    "what": "Over 45,000 apartments, 370,000 rooms and about 3,100 buildings. geometries.csv holds WKT geometry in metres for areas, walls, railings, columns, windows, doors and features (sinks, bathtubs, ...), with entity_type and entity_subtype (about 80 area subtypes, such as BEDROOM, LIVING_ROOM, KITCHEN, BATHROOM, CORRIDOR, BALCONY, LOGGIA, STAIRCASE, SHAFT). Licence CC BY 4.0.",
+    "why_it_matters_for_stoa": "The question labels are printed room names in DE/FR/IT (Zimmer/Pi\u00e8ce/Stanza, K\u00fcche/Cuisine/Cucina, Bad/Bain/Bagno, Korridor/Couloir/Corridoio, Reduit/R\u00e9duit/Ripostiglio, Treppenhaus/Cage d'escalier/Vano scala, Balkon/Balcon/Balcone, Loggia, Wohnen/Essen, S\u00e9jour/repas, Soggiorno/pranzo, Schlafzimmer/Chambre \u00e0 coucher/Camera da letto). The source geometry gives the area subtype for each label, which is the ground truth for the 'exclude balconies, loggias, terraces, shafts, voids' filters in the area intents.",
+    "source_url": "https://zenodo.org/records/7788422",
+    "year": "2022-2023",
+    "code_or_weights_available": "Data public, CC BY 4.0"
+   }
+  ],
+  "concrete_recipe": "Recommendation: a 4-tier cascade. Tier 0 extracts slots with regex. Tier 1 does an exact template lookup. Tier 2 is a multilingual encoder classifier trained on Verda. Tier 3 is Haiku 5.5 with strict structured output. Free-form questions go to the existing Opus/IFC agent. Do not build a seq2seq text-to-DSL model as the main path: in this dataset the slots are verbatim and the intents form a closed set.\n\nDSL (one JSON object per question, about 45 intents):\n{intent: enum, op: count|area|sum_area|sum_volume|sum_length|sum_side_area|lookup, target: window|door_with_leaf|door_any|wc_seat|sink|shower_or_bathtub|bathtub|shower|sauna|kitchen|bedroom|bathroom_room|separate_wc_room|storey|apartment|room_by_label|space|wall|slab|column|stair|beam|sanitary_fixture|..., filters: {label?: str (verbatim), room_number?: str, storey?: str, apartment?: str, model?: str, sheet?: str}, exclude: [balcony, loggia, terrace, outdoor, shaft, void]?, unit: count|m2|m3|m|ft2, scope: this_plan|storey|model|schedule, lexicon_regex?: str}.\nEach intent maps to one deterministic executor per modality (IFC Qto, DXF polylines and blocks, raster detector, PDF text). For example, bathroom_room has lexicon_regex ^(KH|KPH|PH|PE|PESUH|SH)\\b, and WC rooms are excluded.\n\nSteps (about 9-10 h for the core, about 15 h with the stretch goal):\n1. Slot extractor (1.5 h, CPU). Write a quote-aware regex for '...', \"...\", \u00ab...\u00bb (with or without inner spaces), \u201e...\u201c and \u2018...\u2019, and do not split on in-word apostrophes (d'\u00e9tage, women's). Also extract room numbers (\\d+\\.\\d+ or (3-1)), 'apartment A/B', sheet ids (A-\\d+), units (m\u00b2, m\u00b3, metres, meter, sq ft) and storey names. For IFC labels of the form 'NAME (NUM)', split them so we can match IfcSpace Name/LongName.\n2. Intent catalogue (2 h). Hand-label the roughly 45 EN templates: 12 cubicasa, about 14 swiss, about 20 ifc_models. Propagate the labels to the local-language twins automatically: same path, same answer, same slot values. The preview has 1,395 exact EN/local pairs.\n3. Tier 1 exact lookup (0.5 h). Normalise the question (lowercase, slots to <Q>/<N>, collapse whitespace) and look it up in a hash table built from all 120k training questions. Measured on the preview with held-out drawings: 95.0% coverage overall (cubicasa 100%, swiss 99.4%, ifc_models 92.0%). Intent accuracy on a hit should be about 100%, because each template maps to one intent by construction. Cost is $0 and about 1 \u00b5s per question.\n4. Synthetic training data (2 h, Haiku 5.5 Batch API). For each EN template, generate translations into about 30 languages (all EU languages plus the ones present) and about 10 paraphrases each, with slot values sampled from the real label vocabularies (Finnish abbreviations, Swiss DE/FR/IT labels, Estonian/Danish IFC space and storey names). That is about 45 x 30 x 10 = 13.5k pairs. At about 2M output tokens and $0.50/MTok, it costs about $1, or less with batch pricing. Add a held-out language set (for example, translate to 3 languages not in training) to test transfer.\n5. Tier 2 classifier (1-2 h, Verda 1V100.4V, $0.24/h, under 1 h of GPU, under $0.50). Use SetFit on intfloat/multilingual-e5-small (MIT, 118M), with masked-slot input 'query: How many rooms labelled <Q> ...'. As a fallback, run logistic regression on potion-multilingual-128M (MIT, CPU, seconds). Evaluate on held-out drawings plus leave-one-language-out. Expected accuracy on templated intents is 98-99% or higher. That is my estimate from the closed template set. It is not measured, so measure it before you claim it. Inference runs on CPU in under 10 ms (ONNX int8, about 113 MB). Set the acceptance threshold on softmax/kNN margin at about 0.85, tuned on the held-out split.\n6. Tier 3 Haiku fallback (1 h). Call claude-haiku-5-5 with output_config.format set to a JSON schema with the intent enum, the slot fields, and an 'unsupported' or 'free_form' intent. Keep the intent catalogue as a cached system prefix of about 1.5-2k tokens. Cost at $0.10 input and $0.50 output per MTok: about 2k input plus 80 output tokens, so about $0.00024 per call, or less with cache reads. This tier should see under 5% of questions.\n7. Free-form route (no new work). Send ifc_bench and opening_design questions (about 4% of the preview) and questions classified free_form to the existing Opus tool loop and the IFC/DXF native tools. Research (arXiv 2605.01698) supports adaptive exploration over static queries for heterogeneous IFC questions.\n8. Verifiability UI (1 h). Render the parse as chips: 'COUNT - bathroom rooms (KH|KPH|PH|PESUH|SH, excluding WC) - this floor plan'. Link each chip to the highlighted span of the question that produced it. Show which tier decided and its confidence. Each executor then shows its evidence: the matched labels, polygons or IFC GUIDs.\n9. Optional stretch (4-6 h, Verda 1A100.22V, about 1 h of training, about $2.40). Fine-tune Qwen3-0.6B (Apache-2.0) with LoRA on the 13.5k pairs, text to DSL JSON. Serve it with vLLM plus XGrammar, or Outlines, with the JSON schema enforced, as a $0 local replacement for tier 3. Only do this if tiers 1-2 are finished: published work shows constrained decoding gives 100% valid schema but not correct semantics at 0.6B (arXiv 2609.23742). No published accuracy exists for this kind of DSL, so measure it.\n\nExpected end-to-end parser accuracy: about 99% or higher on templated questions (96% of the preview). Free-form questions are scored by the downstream agent, not by the parser. Blended parser cost: 0.95 x $0 + 0.05 x $0.00024, which is about $0.000012 per question. The parser will not be the accuracy bottleneck: the raster-count executors decide the score, so cap time on this track at about 10 h.",
+  "risks": [
+   "The hidden full set (120k questions, about 30 drawing languages) may contain templates and languages that are not in the preview. Exact lookup then misses, and accuracy depends on the tier-2 translations and the Haiku fallback. Run leave-one-language-out evaluation before you trust the numbers.",
+   "Label-match semantics are not defined. Does 'rooms labelled Zimmer' count 'Schlafzimmer' or 'Zimmer 2'? Decide from ground truth (answers in swiss_dwellings), compare exact and token match, and show the rule in the UI.",
+   "Quote extraction breaks on in-word apostrophes (d'\u00e9tage, women's) and on French guillemets with inner spaces (' Pi\u00e8ce '). My quick signature regex already failed on these, so a naive regex silently corrupts slots.",
+   "Finnish abbreviation ambiguity. TK is tuulikaappi (vestibule) on drawings, tankokaappi in fixture legends and tupakeitti\u00f6 (kitchen) in ads. The 'bathroom excluding WC' and 'kitchen including kitchenettes, tupakeitti\u00f6, apukeitti\u00f6' definitions must match the dataset's ground truth, which was probably derived from CubiCasa SVG room classes, not from printed text.",
+   "Unit and scope variants: sq ft in the US opening_design sheets, 'net side area of walls', 'net volume of slabs and plates' (Danish 'd\u00e6k og plader'). A wrong op or unit mapping gives a wrong answer even when the intent is correct, because area answers have only 2% tolerance.",
+   "Do not overinvest. The parser is a solved part. Executor accuracy (raster counts) dominates the score, so time spent on a seq2seq fine-tune here is time taken from the CV detector.",
+   "Most cited accuracy numbers come from other tasks (MASSIVE, ATIS, BIRD). The 98-99% tier-2 figure is an estimate and must be measured on held-out drawings and languages.",
+   "CubiCasa5K is CC BY-NC-SA 4.0. That is fine for a hackathon, but it limits commercial reuse of any model trained on it (relevant to the Stoa work trial).",
+   "Haiku fallback adds latency (hundreds of ms to about 1 s) and an API dependency. Cache the intent catalogue prefix and keep the fallback rate under 5%."
+  ]
+ }
+]

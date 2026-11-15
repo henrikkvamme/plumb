@@ -1,0 +1,2 @@
+rfdetr[train,augment]==1.12.1
+ultralytics==8.4.212

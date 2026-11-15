@@ -1,0 +1,593 @@
+{
+ "partitions": [
+  "val"
+ ],
+ "floors": 210,
+ "errors": [],
+ "val": {
+  "floors": 210,
+  "rooms_vs_source": {
+   "perimeter_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 0.00016
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "baseboard_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 0.01522
+    },
+    "share_within": {
+     "0.005": 0.9993,
+     "0.01": 0.9996,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "baseboard_walls_only_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 0.01522
+    },
+    "share_within": {
+     "0.005": 0.9993,
+     "0.01": 0.9996,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "doors": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "windows": {
+    "items": 5577,
+    "right": 5571,
+    "wrong": 6,
+    "abstained": 0
+   },
+   "rooms_compared": 5577,
+   "rooms_without_partner": 0
+  },
+  "rooms_vs_dxf": {
+   "perimeter_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 7e-05,
+     "p90": 0.00018,
+     "p95": 0.00024,
+     "p99": 0.00037,
+     "max": 0.00088
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "baseboard_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 8e-05,
+     "p90": 0.00025,
+     "p95": 0.00033,
+     "p99": 0.00057,
+     "max": 0.00202
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "baseboard_walls_only_m": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 5577,
+     "median": 8e-05,
+     "p90": 0.00026,
+     "p95": 0.00035,
+     "p99": 0.00061,
+     "max": 0.00222
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "doors": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "windows": {
+    "items": 5577,
+    "right": 5577,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "rooms_compared": 5577,
+   "rooms_without_partner": 0
+  },
+  "groups_vs_source": {
+   "apartment_baseboard_m": {
+    "items": 641,
+    "right": 641,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 641,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.00051,
+     "max": 0.00093
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "apartment_windows": {
+    "items": 641,
+    "right": 637,
+    "wrong": 4,
+    "abstained": 0
+   },
+   "apartment_area_m2": {
+    "items": 641,
+    "right": 641,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 641,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.00026,
+     "max": 0.00049
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "kind_baseboard_m": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 1452,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 4e-05
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "kind_windows": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "kind_area_m2": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 1452,
+     "median": 0.0,
+     "p90": 0.0,
+     "p95": 0.0,
+     "p99": 1e-05,
+     "max": 2e-05
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   }
+  },
+  "groups_vs_dxf": {
+   "apartment_baseboard_m": {
+    "items": 641,
+    "right": 641,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 641,
+     "median": 4e-05,
+     "p90": 0.0001,
+     "p95": 0.00013,
+     "p99": 0.00018,
+     "max": 0.00031
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "apartment_windows": {
+    "items": 641,
+    "right": 641,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "apartment_area_m2": {
+    "items": 641,
+    "right": 641,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 641,
+     "median": 8e-05,
+     "p90": 0.00023,
+     "p95": 0.00028,
+     "p99": 0.00042,
+     "max": 0.00057
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "kind_baseboard_m": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 1452,
+     "median": 5e-05,
+     "p90": 0.00018,
+     "p95": 0.00023,
+     "p99": 0.00038,
+     "max": 0.00061
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   },
+   "kind_windows": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "kind_area_m2": {
+    "items": 1452,
+    "right": 1452,
+    "wrong": 0,
+    "abstained": 0,
+    "rel_error": {
+     "n": 1452,
+     "median": 0.00015,
+     "p90": 0.00066,
+     "p95": 0.00098,
+     "p99": 0.00231,
+     "max": 0.00362
+    },
+    "share_within": {
+     "0.005": 1.0,
+     "0.01": 1.0,
+     "0.02": 1.0,
+     "0.05": 1.0
+    }
+   }
+  },
+  "walls": {
+   "pdf_vs_src_centerline": {
+    "items": 210,
+    "right": 204,
+    "wrong": 6,
+    "abstained": 0,
+    "rel_error": {
+     "n": 210,
+     "median": 0.00493,
+     "p90": 0.01163,
+     "p95": 0.01578,
+     "p99": 0.02705,
+     "max": 0.04951
+    },
+    "share_within": {
+     "0.005": 0.5143,
+     "0.01": 0.8571,
+     "0.02": 0.9714,
+     "0.05": 1.0
+    }
+   },
+   "dxf_vs_src_centerline": {
+    "items": 210,
+    "right": 202,
+    "wrong": 8,
+    "abstained": 0,
+    "rel_error": {
+     "n": 210,
+     "median": 0.00529,
+     "p90": 0.01225,
+     "p95": 0.01723,
+     "p99": 0.02876,
+     "max": 0.05079
+    },
+    "share_within": {
+     "0.005": 0.481,
+     "0.01": 0.8429,
+     "0.02": 0.9619,
+     "0.05": 0.9952
+    }
+   },
+   "pdf_vs_dxf_centerline": {
+    "items": 210,
+    "right": 207,
+    "wrong": 3,
+    "abstained": 0,
+    "rel_error": {
+     "n": 210,
+     "median": 0.00113,
+     "p90": 0.00686,
+     "p95": 0.01174,
+     "p99": 0.02276,
+     "max": 0.02606
+    },
+    "share_within": {
+     "0.005": 0.8619,
+     "0.01": 0.9429,
+     "0.02": 0.9857,
+     "0.05": 1.0
+    }
+   },
+   "pdf_vs_src_exterior": {
+    "items": 210,
+    "right": 188,
+    "wrong": 22,
+    "abstained": 0,
+    "rel_error": {
+     "n": 210,
+     "median": 0.00692,
+     "p90": 0.02016,
+     "p95": 0.03302,
+     "p99": 0.08211,
+     "max": 0.27905
+    },
+    "share_within": {
+     "0.005": 0.3857,
+     "0.01": 0.6952,
+     "0.02": 0.8952,
+     "0.05": 0.9714
+    }
+   },
+   "element_sum_over_centerline": {
+    "n": 210,
+    "median": 1.10532,
+    "p90": 1.21277,
+    "p95": 1.23865,
+    "p99": 1.26086,
+    "max": 1.27605
+   }
+  },
+  "door_widths_vs_source": {
+   "floors": 210,
+   "floors_same_door_count": 210,
+   "abs_error_m_sorted_pairs": {
+    "n": 5240,
+    "median": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.0,
+    "max": 0.001
+   },
+   "within_1cm": 1.0
+  },
+  "kinds": {
+   "rooms": 5277,
+   "kind_is_subtype": 5260
+  },
+  "unmatched_rooms": 0,
+  "seconds_pdf": {
+   "n": 210,
+   "median": 0.232,
+   "p90": 0.598,
+   "p95": 0.69,
+   "p99": 1.305,
+   "max": 2.365
+  }
+ },
+ "baseboard_worst": [
+  {
+   "doc": "site1119_bldg2262_floor10576.pdf",
+   "room": "4.58",
+   "rel": 0.0152
+  },
+  {
+   "doc": "site1119_bldg2262_floor10576.pdf",
+   "room": "4.55",
+   "rel": 0.015
+  },
+  {
+   "doc": "site467_bldg1117_floor4898.pdf",
+   "room": "5.15",
+   "rel": 0.0098
+  },
+  {
+   "doc": "site467_bldg1117_floor4898.pdf",
+   "room": "5.02",
+   "rel": 0.0097
+  },
+  {
+   "doc": "site366_bldg806_floor11859.pdf",
+   "room": "1.35",
+   "rel": 0.0046
+  },
+  {
+   "doc": "site366_bldg806_floor11859.pdf",
+   "room": "1.47",
+   "rel": 0.0046
+  },
+  {
+   "doc": "site918_bldg1941_floor8511.pdf",
+   "room": "1.06",
+   "rel": 0.0036
+  },
+  {
+   "doc": "site918_bldg1941_floor8511.pdf",
+   "room": "1.29",
+   "rel": 0.0036
+  },
+  {
+   "doc": "site1099_bldg2236_floor10248.pdf",
+   "room": "6.04",
+   "rel": 0.0025
+  },
+  {
+   "doc": "site1099_bldg2236_floor10248.pdf",
+   "room": "6.21",
+   "rel": 0.0025
+  },
+  {
+   "doc": "site1264_bldg2456_floor11487.pdf",
+   "room": "2.57",
+   "rel": 0.0016
+  },
+  {
+   "doc": "site1264_bldg2456_floor11487.pdf",
+   "room": "2.21",
+   "rel": 0.0016
+  },
+  {
+   "doc": "site467_bldg1117_floor4898.pdf",
+   "room": "5.18",
+   "rel": 0.0013
+  },
+  {
+   "doc": "site467_bldg1117_floor4898.pdf",
+   "room": "5.13",
+   "rel": 0.0013
+  },
+  {
+   "doc": "site253_bldg462_floor1823.pdf",
+   "room": "0.29",
+   "rel": 0.0011
+  },
+  {
+   "doc": "site253_bldg462_floor1823.pdf",
+   "room": "0.20",
+   "rel": 0.0011
+  },
+  {
+   "doc": "site253_bldg462_floor1823.pdf",
+   "room": "0.13",
+   "rel": 0.0005
+  },
+  {
+   "doc": "site253_bldg462_floor1823.pdf",
+   "room": "0.37",
+   "rel": 0.0005
+  },
+  {
+   "doc": "site198_bldg2783_floor12877.pdf",
+   "room": "4.12",
+   "rel": 0.0002
+  },
+  {
+   "doc": "site1126_bldg2269_floor47414.pdf",
+   "room": "6.48",
+   "rel": 0.0002
+  },
+  {
+   "doc": "site10686_bldg15413_floor40060.pdf",
+   "room": "2.18",
+   "rel": 0.0002
+  },
+  {
+   "doc": "site1274_bldg2475_floor11575.pdf",
+   "room": "1.09",
+   "rel": 0.0001
+  },
+  {
+   "doc": "site1274_bldg2475_floor11575.pdf",
+   "room": "1.10",
+   "rel": 0.0001
+  },
+  {
+   "doc": "site866_bldg1830_floor8128.pdf",
+   "room": "3.10",
+   "rel": 0.0001
+  },
+  {
+   "doc": "site495_bldg1180_floor5214.pdf",
+   "room": "3.12",
+   "rel": 0.0001
+  }
+ ]
+}

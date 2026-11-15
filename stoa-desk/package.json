@@ -1,0 +1,62 @@
+{
+  "name": "stoa-desk",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vp dev --port 4725 --host 0.0.0.0",
+    "py": "sh py/run.sh",
+    "build": "vp build",
+    "preview": "vp preview",
+    "start": "srvx serve --prod --port 3000 --entry dist/server/server.js --static ../client",
+    "typecheck": "effect-tsrs --project tsconfig.json --strict --type-check",
+    "lint": "vp lint --deny-warnings",
+    "fmt": "vp fmt",
+    "fix": "vp lint --fix; vp fmt",
+    "check": "node tools/cli/require-node.mjs && node tools/cli/main.ts check",
+    "j": "node tools/cli/require-node.mjs && node tools/cli/main.ts"
+  },
+  "dependencies": {
+    "@effect/atom-react": "4.1.4",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-start": "1.169.5",
+    "@ui-sdk/core": "0.1.0-beta.1",
+    "@ui-sdk/react": "0.1.0-beta.1",
+    "@xstate/effect": "1.0.0-beta.1",
+    "@xstate/react": "7.0.0-beta.0",
+    "clsx": "^2.1.1",
+    "effect": "4.1.4",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "srvx": "1.0.8",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.181.0",
+    "xstate": "6.0.0-beta.2"
+  },
+  "devDependencies": {
+    "@effect/platform-node": "4.1.4",
+    "@oxlint/plugins": "1.93.0",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "0.181.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@yielded/effect-tsrs": "0.2.3",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "typescript": "7.0.2",
+    "ultracite": "8.2.0",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vite-plus": "1.6.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.21.0"
+}

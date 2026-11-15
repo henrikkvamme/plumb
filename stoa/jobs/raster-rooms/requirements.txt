@@ -1,0 +1,6 @@
+torch
+torchvision
+segmentation-models-pytorch==0.6.0
+timm
+opencv-python-headless
+numpy

@@ -1,0 +1,310 @@
+{
+ "partitions": [
+  "dev",
+  "val"
+ ],
+ "floors": 833,
+ "errors": [],
+ "rooms_vs_dxf": {
+  "pdf_rooms": 22966,
+  "dxf_rooms": 22966,
+  "matched_by_number": 22966,
+  "recall": 1.0,
+  "precision": 1.0,
+  "label_agreement": 1.0,
+  "label_pairs": 21776,
+  "rooms_with_both_areas": 22966,
+  "rooms_without_pdf_area": 0,
+  "area_rel_error": {
+   "median": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 1.1e-05,
+   "max": 0.000455
+  },
+  "area_share_within": {
+   "0.001": 1.0,
+   "0.005": 1.0,
+   "0.01": 1.0,
+   "0.02": 1.0,
+   "0.05": 1.0
+  },
+  "dxf_numbers_missing_in_pdf": [],
+  "area_worst": [
+   {
+    "doc": "site42_bldg282_floor1108.pdf",
+    "room": "3.19",
+    "pdf": 0.2197,
+    "dxf": 0.2196,
+    "rel": 0.0005
+   },
+   {
+    "doc": "site673_bldg1432_floor6274.pdf",
+    "room": "4.04",
+    "pdf": 0.4121,
+    "dxf": 0.412,
+    "rel": 0.0002
+   },
+   {
+    "doc": "site1146_bldg2297_floor10635.pdf",
+    "room": "2.01",
+    "pdf": 0.4403,
+    "dxf": 0.4402,
+    "rel": 0.0002
+   },
+   {
+    "doc": "site1016_bldg2095_floor9450.pdf",
+    "room": "1.13",
+    "pdf": 0.9618,
+    "dxf": 0.9619,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site794_bldg1734_floor7718.pdf",
+    "room": "0.36",
+    "pdf": 1.1915,
+    "dxf": 1.1914,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site484_bldg1141_floor5036.pdf",
+    "room": "4.103",
+    "pdf": 1.2065,
+    "dxf": 1.2064,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site1173_bldg2338_floor10813.pdf",
+    "room": "3.36",
+    "pdf": 1.2786,
+    "dxf": 1.2787,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site935_bldg1968_floor8671.pdf",
+    "room": "3.10",
+    "pdf": 1.6371,
+    "dxf": 1.637,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site1138_bldg2292_floor10584.pdf",
+    "room": "3.93",
+    "pdf": 1.6724,
+    "dxf": 1.6723,
+    "rel": 0.0001
+   },
+   {
+    "doc": "site3425_bldg5299_floor23614.pdf",
+    "room": "3.21",
+    "pdf": 1.6767,
+    "dxf": 1.6766,
+    "rel": 0.0001
+   }
+  ]
+ },
+ "counts_vs_dxf": {
+  "doors": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 25402,
+   "label_total": 25402,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "windows": {
+   "floors": 833,
+   "exact": 0.9988,
+   "pdf_total": 14620,
+   "label_total": 14621,
+   "difference_histogram": {
+    "-1": 1,
+    "0": 832
+   }
+  },
+  "apartments": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 2667,
+   "label_total": 2667,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "doors_distinct": {
+   "floors": 833,
+   "exact": 0.07923,
+   "pdf_total": 21507,
+   "label_total": 25402,
+   "difference_histogram": {
+    "-40": 1,
+    "-32": 1,
+    "-26": 1,
+    "-25": 2,
+    "-24": 1,
+    "-21": 1,
+    "-20": 2,
+    "-19": 3,
+    "-18": 3,
+    "-17": 5,
+    "-16": 4,
+    "-15": 7,
+    "-14": 2,
+    "-13": 5,
+    "-12": 12,
+    "-11": 14,
+    "-10": 16,
+    "-9": 29,
+    "-8": 35,
+    "-7": 44,
+    "-6": 66,
+    "-5": 58,
+    "-4": 130,
+    "-3": 112,
+    "-2": 142,
+    "-1": 71,
+    "0": 66
+   }
+  }
+ },
+ "counts_vs_source": {
+  "doors": {
+   "floors": 833,
+   "exact": 0.07923,
+   "pdf_total": 25402,
+   "label_total": 21507,
+   "difference_histogram": {
+    "0": 66,
+    "1": 71,
+    "2": 142,
+    "3": 112,
+    "4": 130,
+    "5": 58,
+    "6": 66,
+    "7": 44,
+    "8": 35,
+    "9": 29,
+    "10": 16,
+    "11": 14,
+    "12": 12,
+    "13": 5,
+    "14": 2,
+    "15": 7,
+    "16": 4,
+    "17": 5,
+    "18": 3,
+    "19": 3,
+    "20": 2,
+    "21": 1,
+    "24": 1,
+    "25": 2,
+    "26": 1,
+    "32": 1,
+    "40": 1
+   }
+  },
+  "windows": {
+   "floors": 833,
+   "exact": 0.73709,
+   "pdf_total": 14620,
+   "label_total": 14014,
+   "difference_histogram": {
+    "-1": 1,
+    "0": 614,
+    "1": 94,
+    "2": 50,
+    "3": 21,
+    "4": 19,
+    "5": 7,
+    "6": 7,
+    "7": 2,
+    "8": 4,
+    "9": 4,
+    "10": 3,
+    "11": 3,
+    "12": 2,
+    "14": 2
+   }
+  },
+  "toilets": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 3423,
+   "label_total": 3423,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "washbasins": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 3583,
+   "label_total": 3583,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "bathtubs": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 2309,
+   "label_total": 2309,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "showers": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 590,
+   "label_total": 590,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "apartments": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 2667,
+   "label_total": 2667,
+   "difference_histogram": {
+    "0": 833
+   }
+  },
+  "doors_distinct": {
+   "floors": 833,
+   "exact": 1.0,
+   "pdf_total": 21507,
+   "label_total": 21507,
+   "difference_histogram": {
+    "0": 833
+   }
+  }
+ },
+ "printed_vs_polygon": {
+  "floors_with_printed_areas": 249,
+  "rooms_with_printed_area": 6587,
+  "rooms_with_printed_and_polygon": 6587,
+  "mismatch_over_2pct": 0,
+  "mismatches": [],
+  "room_area_keys_on_printed_rooms": 496,
+  "key_equals_printed_0.05pct": 496,
+  "key_equals_polygon_0.05pct": 397,
+  "printed_rel_error_vs_polygon": {
+   "median": 0.000232,
+   "p90": 0.000835,
+   "p95": 0.001137,
+   "p99": 0.002125,
+   "max": 0.00573
+  }
+ },
+ "scale": {
+  "1:100 bar_agrees=True": 695,
+  "1:200 bar_agrees=True": 138
+ },
+ "by_scale_area_median_error": {
+  "100": 0.0,
+  "200": 0.0
+ }
+}

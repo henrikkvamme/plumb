@@ -1,0 +1,15 @@
+export const BrandMark = () => (
+  <svg
+    aria-hidden="true"
+    className="size-[18px] shrink-0"
+    fill="currentColor"
+    stroke="currentColor"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="4 4 24 24"
+  >
+    <path d="M16 14.55L25 19.5L16 24.45L7 19.5Z" opacity="0.35" />
+    <path d="M16 10.8L25 15.75L16 20.7L7 15.75Z" />
+    <path d="M16 7.05L25 12L16 16.95L7 12Z" fill="#2f6bff" stroke="#2f6bff" />
+  </svg>
+);

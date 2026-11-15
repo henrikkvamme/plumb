@@ -1,0 +1,230 @@
+{
+ "model": "artifacts/cubicasa-detect/yolo26m",
+ "thresholds": {
+  "door": 0.275,
+  "window": 0.375
+ },
+ "families": {
+  "blueprint": {
+   "images": 179,
+   "door": {
+    "recall": 0.277,
+    "precision": 0.992,
+    "count_exact": 0.039,
+    "rooms_exact": 0.234,
+    "rule": 0.986
+   },
+   "window": {
+    "recall": 0.057,
+    "precision": 0.832,
+    "count_exact": 0.006,
+    "rooms_exact": 0.47,
+    "rule": 0.998
+   }
+  },
+  "cad_outline": {
+   "images": 29,
+   "door": {
+    "recall": 0.709,
+    "precision": 0.991,
+    "count_exact": 0.414,
+    "rooms_exact": 0.662,
+    "rule": 0.987
+   },
+   "window": {
+    "recall": 0.723,
+    "precision": 0.913,
+    "count_exact": 0.241,
+    "rooms_exact": 0.814,
+    "rule": 0.999
+   }
+  },
+  "cad_solid": {
+   "images": 28,
+   "door": {
+    "recall": 0.812,
+    "precision": 0.991,
+    "count_exact": 0.536,
+    "rooms_exact": 0.752,
+    "rule": 0.987
+   },
+   "window": {
+    "recall": 0.783,
+    "precision": 0.971,
+    "count_exact": 0.393,
+    "rooms_exact": 0.84,
+    "rule": 0.999
+   }
+  },
+  "colour": {
+   "images": 20,
+   "door": {
+    "recall": 0.874,
+    "precision": 0.971,
+    "count_exact": 0.4,
+    "rooms_exact": 0.78,
+    "rule": 0.988
+   },
+   "window": {
+    "recall": 0.889,
+    "precision": 0.981,
+    "count_exact": 0.4,
+    "rooms_exact": 0.904,
+    "rule": 1.0
+   }
+  },
+  "dark": {
+   "images": 28,
+   "door": {
+    "recall": 0.134,
+    "precision": 0.991,
+    "count_exact": 0.0,
+    "rooms_exact": 0.13,
+    "rule": 0.978
+   },
+   "window": {
+    "recall": 0.036,
+    "precision": 0.81,
+    "count_exact": 0.0,
+    "rooms_exact": 0.466,
+    "rule": 0.998
+   }
+  },
+  "grey_poche": {
+   "images": 20,
+   "door": {
+    "recall": 0.793,
+    "precision": 0.964,
+    "count_exact": 0.45,
+    "rooms_exact": 0.765,
+    "rule": 0.989
+   },
+   "window": {
+    "recall": 0.703,
+    "precision": 0.925,
+    "count_exact": 0.4,
+    "rooms_exact": 0.808,
+    "rule": 0.994
+   }
+  },
+  "hatch": {
+   "images": 19,
+   "door": {
+    "recall": 0.699,
+    "precision": 0.961,
+    "count_exact": 0.211,
+    "rooms_exact": 0.641,
+    "rule": 0.994
+   },
+   "window": {
+    "recall": 0.525,
+    "precision": 0.935,
+    "count_exact": 0.158,
+    "rooms_exact": 0.727,
+    "rule": 0.998
+   }
+  },
+  "held-out styles": {
+   "images": 375,
+   "door": {
+    "recall": 0.505,
+    "precision": 0.968,
+    "count_exact": 0.173,
+    "rooms_exact": 0.445,
+    "rule": 0.986
+   },
+   "window": {
+    "recall": 0.383,
+    "precision": 0.924,
+    "count_exact": 0.125,
+    "rooms_exact": 0.632,
+    "rule": 0.998
+   }
+  },
+  "known styles": {
+   "images": 200,
+   "door": {
+    "recall": 0.674,
+    "precision": 0.968,
+    "count_exact": 0.365,
+    "rooms_exact": 0.632,
+    "rule": 0.985
+   },
+   "window": {
+    "recall": 0.615,
+    "precision": 0.941,
+    "count_exact": 0.26,
+    "rooms_exact": 0.752,
+    "rule": 0.998
+   }
+  },
+  "scan": {
+   "images": 30,
+   "door": {
+    "recall": 0.71,
+    "precision": 0.917,
+    "count_exact": 0.367,
+    "rooms_exact": 0.673,
+    "rule": 0.98
+   },
+   "window": {
+    "recall": 0.567,
+    "precision": 0.955,
+    "count_exact": 0.267,
+    "rooms_exact": 0.727,
+    "rule": 0.999
+   }
+  },
+  "sketch": {
+   "images": 196,
+   "door": {
+    "recall": 0.718,
+    "precision": 0.96,
+    "count_exact": 0.296,
+    "rooms_exact": 0.642,
+    "rule": 0.986
+   },
+   "window": {
+    "recall": 0.689,
+    "precision": 0.932,
+    "count_exact": 0.235,
+    "rooms_exact": 0.781,
+    "rule": 0.998
+   }
+  },
+  "stoa": {
+   "images": 420,
+   "door": {
+    "recall": 0.975,
+    "precision": 0.93,
+    "count_exact": 0.157,
+    "rooms_exact": 0.904,
+    "rule": 0.987
+   },
+   "window": {
+    "recall": 0.901,
+    "precision": 0.984,
+    "count_exact": 0.433,
+    "rooms_exact": 0.919,
+    "rule": 0.998
+   }
+  },
+  "thin": {
+   "images": 26,
+   "door": {
+    "recall": 0.849,
+    "precision": 0.985,
+    "count_exact": 0.538,
+    "rooms_exact": 0.803,
+    "rule": 0.987
+   },
+   "window": {
+    "recall": 0.779,
+    "precision": 0.904,
+    "count_exact": 0.269,
+    "rooms_exact": 0.799,
+    "rule": 0.998
+   }
+  }
+ }
+}

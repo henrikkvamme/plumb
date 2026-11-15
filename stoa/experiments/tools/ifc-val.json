@@ -1,0 +1,337 @@
+{
+ "partition": "val",
+ "ifc_model": {
+  "area_room/ifc": {
+   "items": 21,
+   "correct": 21,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "area_room/via_pdf": {
+   "items": 186,
+   "correct": 186,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "area_total_storey/ifc": {
+   "items": 3,
+   "correct": 3,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "area_total_storey/via_pdf": {
+   "items": 11,
+   "correct": 11,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "area_wall_side/via_pdf": {
+   "items": 2,
+   "correct": 2,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "count_model/ifc": {
+   "items": 14,
+   "correct": 14,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "count_model/via_pdf": {
+   "items": 24,
+   "correct": 24,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "count_storey/ifc": {
+   "items": 6,
+   "correct": 6,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "count_storey/via_pdf": {
+   "items": 36,
+   "correct": 36,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "length_walls/via_pdf": {
+   "items": 2,
+   "correct": 2,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "volume_slabs/via_pdf": {
+   "items": 1,
+   "correct": 1,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "volume_walls/via_pdf": {
+   "items": 2,
+   "correct": 2,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  }
+ },
+ "ifc_sheet": {
+  "area_room": {
+   "items": 186,
+   "correct": 142,
+   "wrong": 0,
+   "abstained": 44,
+   "agreement": 0.7634,
+   "precision": 1.0
+  },
+  "area_total_storey": {
+   "items": 11,
+   "correct": 11,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "area_wall_side": {
+   "items": 2,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 2,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "count_model": {
+   "items": 24,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 24,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "count_storey_column": {
+   "items": 2,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 2,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "count_storey_door": {
+   "items": 11,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 11,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "count_storey_space": {
+   "items": 13,
+   "correct": 13,
+   "wrong": 0,
+   "abstained": 0,
+   "agreement": 1.0,
+   "precision": 1.0
+  },
+  "count_storey_stair": {
+   "items": 8,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 8,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "count_storey_wall": {
+   "items": 2,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 2,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "length_walls": {
+   "items": 2,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 2,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "volume_slabs": {
+   "items": 1,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 1,
+   "agreement": 0.0,
+   "precision": 0.0
+  },
+  "volume_walls": {
+   "items": 2,
+   "correct": 0,
+   "wrong": 0,
+   "abstained": 2,
+   "agreement": 0.0,
+   "precision": 0.0
+  }
+ },
+ "sheet_route_split": {
+  "answered": 166,
+  "items": 264,
+  "abstained:unsupported": 23,
+  "abstained:ambiguous": 44,
+  "abstained:not_on_document": 31
+ },
+ "ifc_text": {
+  "none": {
+   "items": 62,
+   "all_facts": 0,
+   "no_facts": 15,
+   "no_plan": 47,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "types": {
+   "items": 35,
+   "all_facts": 14,
+   "no_facts": 5,
+   "no_plan": 0,
+   "precision_if_answered": 0.4,
+   "fact_recall": 0.7852
+  },
+  "count": {
+   "items": 17,
+   "all_facts": 1,
+   "no_facts": 4,
+   "no_plan": 0,
+   "precision_if_answered": 0.0588,
+   "fact_recall": 0.4615
+  },
+  "spaces": {
+   "items": 17,
+   "all_facts": 1,
+   "no_facts": 1,
+   "no_plan": 0,
+   "precision_if_answered": 0.0588,
+   "fact_recall": 0.7664
+  },
+  "materials": {
+   "items": 9,
+   "all_facts": 0,
+   "no_facts": 3,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.3091
+  },
+  "systems": {
+   "items": 9,
+   "all_facts": 0,
+   "no_facts": 6,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "thickness": {
+   "items": 7,
+   "all_facts": 1,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.1429,
+   "fact_recall": 0.1154
+  },
+  "fire_rating": {
+   "items": 6,
+   "all_facts": 0,
+   "no_facts": 6,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "slab_volume": {
+   "items": 4,
+   "all_facts": 1,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.25,
+   "fact_recall": 0.0769
+  },
+  "load_bearing": {
+   "items": 4,
+   "all_facts": 1,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.25,
+   "fact_recall": 0.5263
+  },
+  "wall_length": {
+   "items": 3,
+   "all_facts": 0,
+   "no_facts": 1,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "location": {
+   "items": 3,
+   "all_facts": 0,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.4444
+  },
+  "space_heights": {
+   "items": 2,
+   "all_facts": 0,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "metadata": {
+   "items": 2,
+   "all_facts": 2,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 1.0,
+   "fact_recall": 1.0
+  },
+  "largest_room": {
+   "items": 1,
+   "all_facts": 0,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 0.0,
+   "fact_recall": 0.0
+  },
+  "levels": {
+   "items": 1,
+   "all_facts": 1,
+   "no_facts": 0,
+   "no_plan": 0,
+   "precision_if_answered": 1.0,
+   "fact_recall": 1.0
+  }
+ },
+ "seconds": 3.4
+}

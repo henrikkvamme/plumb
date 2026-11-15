@@ -1,0 +1,13 @@
+*
+!stoa-desk
+!stoa/src/bp
+stoa-desk/node_modules
+stoa-desk/dist
+stoa-desk/.verify
+stoa-desk/.env
+stoa-desk/.tanstack
+stoa-desk/.nitro
+stoa-desk/.output
+stoa-desk/py/.cache
+stoa-desk/py/.uploads
+**/__pycache__

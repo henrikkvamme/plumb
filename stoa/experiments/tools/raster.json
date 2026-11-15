@@ -1,0 +1,406 @@
+{
+ "partition": "val",
+ "sheets": 210,
+ "model": {
+  "encoder": "resnet34",
+  "step": 2800,
+  "held_out": {
+   "step": 2800,
+   "t": 775,
+   "bce": 0.01661,
+   "dice": 0.10319,
+   "area": 0.00358,
+   "iou_interior": 0.9875,
+   "iou_wall": 0.91384,
+   "iou_boundary": 0.70697,
+   "iou_opening": 0.88301,
+   "score": 0.06892
+  },
+  "bytes": 48986075
+ },
+ "ocr": {
+  "area": {
+   "n": 1770,
+   "found": 0.9842,
+   "right": 0.8932,
+   "exact": 0.8107
+  },
+  "label": {
+   "n": 5285,
+   "found": 0.9769,
+   "right": 0.8942,
+   "exact": 0.8942
+  },
+  "number": {
+   "n": 5577,
+   "found": 0.9631,
+   "right": 0.9252,
+   "exact": 0.9094
+  },
+  "tag": {
+   "n": 641,
+   "found": 1.0,
+   "right": 0.9844,
+   "exact": 0.9844
+  },
+  "position_error_px": {
+   "median": 1.98,
+   "p95": 2.69
+  },
+  "seconds_per_sheet": 29.613,
+  "sheets": 210,
+  "upscale": 2.0,
+  "examples_of_misses": [
+   [
+    "2.04",
+    null
+   ],
+   [
+    "4.96 m²",
+    "4.96mm²"
+   ],
+   [
+    "Korridor",
+    "Komidor"
+   ],
+   [
+    "2.16",
+    null
+   ],
+   [
+    "Zimmer",
+    "Zimmek"
+   ],
+   [
+    "2.23",
+    null
+   ],
+   [
+    "Korridor",
+    "Korfidor"
+   ],
+   [
+    "4.11",
+    "41I"
+   ],
+   [
+    "1.14",
+    "14"
+   ],
+   [
+    "Zimmer",
+    "Żimmer"
+   ],
+   [
+    "2.68 m²",
+    "2.68"
+   ],
+   [
+    "10.55 m²",
+    "10.55²"
+   ],
+   [
+    "1.07",
+    "/1.07"
+   ],
+   [
+    "1.12",
+    "1.1p"
+   ],
+   [
+    "Lift",
+    null
+   ],
+   [
+    "Cucina",
+    "Cuçina"
+   ],
+   [
+    "Cucina",
+    "Cuçina"
+   ],
+   [
+    "Corridoio",
+    "Corridpio"
+   ],
+   [
+    "Ascensore",
+    "Asçensøre"
+   ],
+   [
+    "Korridor",
+    "Kordor"
+   ],
+   [
+    "1.81 m²",
+    "1.81 ml"
+   ],
+   [
+    "4.19",
+    "419"
+   ],
+   [
+    "4.29",
+    "429"
+   ],
+   [
+    "1.68 m²",
+    "1/68 m²"
+   ],
+   [
+    "2.60 m²",
+    "260m²"
+   ],
+   [
+    "4.37",
+    "437"
+   ],
+   [
+    "2.15",
+    "215"
+   ],
+   [
+    "Korridor",
+    "Kopridor"
+   ],
+   [
+    "Bad",
+    "Bad/"
+   ],
+   [
+    "Lift",
+    "ft"
+   ]
+  ]
+ },
+ "scale": {
+  "sheets": 210,
+  "found": 210,
+  "both_witnesses": 210,
+  "agree": 210,
+  "error_vs_dxf_fit": {
+   "n": 210,
+   "median": 7e-06,
+   "max": 0.000537,
+   "within_1pct": 1.0
+  },
+  "error_vs_59_0551": {
+   "n": 210,
+   "median": 0.000127,
+   "max": 0.000127,
+   "within_1pct": 1.0
+  },
+  "bar_error": {
+   "n": 210,
+   "median": 0.000876,
+   "max": 0.000988,
+   "within_1pct": 1.0
+  },
+  "text_error": {
+   "n": 210,
+   "median": 7e-06,
+   "max": 0.000537,
+   "within_1pct": 1.0
+  },
+  "missing": [],
+  "disagree": [],
+  "cubicasa": {
+   "plans": 60,
+   "scale_found": 0,
+   "found_on": []
+  }
+ },
+ "rooms_baseline": {
+  "sheets": 210,
+  "rooms": 5577,
+  "found_by_ocr": 0.9256,
+  "baseline": {
+   "within_2pct": 0.2584,
+   "within_5pct": 0.4608
+  },
+  "model": {
+   "within_2pct": 0.0,
+   "within_5pct": 0.0
+  },
+  "area": {
+   "within_2pct": 0.322,
+   "within_5pct": 0.4617
+  },
+  "no_printed_area": {
+   "rooms": 3807,
+   "baseline": {
+    "within_2pct": 0.2493,
+    "within_5pct": 0.4458
+   },
+   "model": {
+    "within_2pct": 0.0,
+    "within_5pct": 0.0
+   },
+   "area": {
+    "within_2pct": 0.2501,
+    "within_5pct": 0.4458
+   }
+  },
+  "by_confidence": {
+   "high": {
+    "rooms": 834,
+    "within_2pct": 0.9988,
+    "within_5pct": 1.0
+   },
+   "medium": {
+    "rooms": 0,
+    "within_2pct": 0.0,
+    "within_5pct": 0.0
+   },
+   "low": {
+    "rooms": 4229,
+    "within_2pct": 0.2277,
+    "within_5pct": 0.4117
+   },
+   "none": {
+    "rooms": 99,
+    "within_2pct": 0.0,
+    "within_5pct": 0.0
+   }
+  },
+  "by_source": {
+   "baseline": 4229,
+   "printed": 834,
+   "none": 99
+  },
+  "floor_total_error": {
+   "median": 0.0257,
+   "within_2pct": 0.3619
+  },
+  "label_exact": 0.9209,
+  "apartment_right": 0.9473,
+  "no_apartment_right": 1.0,
+  "outdoor_right": 0.9934,
+  "apartment_sets_exact": 0.9714,
+  "extra_numbers_per_sheet": 0.31,
+  "seconds_per_sheet": 0.46
+ },
+ "rooms": {
+  "sheets": 210,
+  "rooms": 5577,
+  "found_by_ocr": 0.9353,
+  "baseline": {
+   "within_2pct": 0.2605,
+   "within_5pct": 0.4649
+  },
+  "model": {
+   "within_2pct": 0.7913,
+   "within_5pct": 0.8935
+  },
+  "area": {
+   "within_2pct": 0.8119,
+   "within_5pct": 0.8935
+  },
+  "no_printed_area": {
+   "rooms": 3807,
+   "baseline": {
+    "within_2pct": 0.2522,
+    "within_5pct": 0.4513
+   },
+   "model": {
+    "within_2pct": 0.7712,
+    "within_5pct": 0.8815
+   },
+   "area": {
+    "within_2pct": 0.773,
+    "within_5pct": 0.8818
+   }
+  },
+  "by_confidence": {
+   "high": {
+    "rooms": 2709,
+    "within_2pct": 0.9664,
+    "within_5pct": 0.9945
+   },
+   "medium": {
+    "rooms": 1298,
+    "within_2pct": 0.8482,
+    "within_5pct": 0.9453
+   },
+   "low": {
+    "rooms": 1186,
+    "within_2pct": 0.6821,
+    "within_5pct": 0.8954
+   },
+   "none": {
+    "rooms": 23,
+    "within_2pct": 0.0,
+    "within_5pct": 0.0
+   }
+  },
+  "by_source": {
+   "printed": 1497,
+   "model": 3696,
+   "none": 23
+  },
+  "floor_total_error": {
+   "median": 0.0082,
+   "within_2pct": 0.7095
+  },
+  "label_exact": 0.9178,
+  "apartment_right": 0.9721,
+  "no_apartment_right": 1.0,
+  "outdoor_right": 0.9929,
+  "apartment_sets_exact": 0.9714,
+  "extra_numbers_per_sheet": 0.371,
+  "seconds_per_sheet": 9.42
+ },
+ "worst_sheets": [
+  {
+   "stem": "site1631_bldg2806_floor13030",
+   "rooms": 89,
+   "off_5pct": 23
+  },
+  {
+   "stem": "site998_bldg2079_floor9341",
+   "rooms": 72,
+   "off_5pct": 19
+  },
+  {
+   "stem": "site1138_bldg2292_floor10584",
+   "rooms": 99,
+   "off_5pct": 18
+  },
+  {
+   "stem": "site2256_bldg3194_floor14333",
+   "rooms": 91,
+   "off_5pct": 18
+  },
+  {
+   "stem": "site366_bldg806_floor11859",
+   "rooms": 81,
+   "off_5pct": 17
+  },
+  {
+   "stem": "site1063_bldg2181_floor9927",
+   "rooms": 63,
+   "off_5pct": 15
+  },
+  {
+   "stem": "site1099_bldg2236_floor10248",
+   "rooms": 58,
+   "off_5pct": 13
+  },
+  {
+   "stem": "site992_bldg2073_floor9296",
+   "rooms": 64,
+   "off_5pct": 13
+  },
+  {
+   "stem": "site2249_bldg3184_floor14283",
+   "rooms": 52,
+   "off_5pct": 11
+  },
+  {
+   "stem": "site307_bldg610_floor2509",
+   "rooms": 96,
+   "off_5pct": 11
+  }
+ ],
+ "minutes": 9.4
+}
